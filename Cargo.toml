@@ -1,0 +1,6 @@
+[package]
+name = "competitive-rust"
+version = "0.1.0"
+authors = ["hamadu <dercll1020@gmail.com>"]
+
+[dependencies]
