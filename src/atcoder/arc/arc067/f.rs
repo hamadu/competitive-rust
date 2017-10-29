@@ -59,122 +59,137 @@ parse_tuple!(A, B, C);
 
 // ===
 
-const MAX: i32 = 1000000;
-const MIN: i32 = -100;
+struct BucketArray {
+    n: usize,
+    bn: usize,
+    bucket_size: usize,
+    data: Vec<i32>,
+    bucket: Vec<i32>,
+}
+
+impl BucketArray {
+    fn new(n: usize) -> Self {
+        let bucket_size = max(50, (n as f64).sqrt() as usize);
+        let bn = (n + bucket_size - 1) / bucket_size;
+
+        BucketArray {
+            n: n,
+            bn: bn,
+            bucket_size: bucket_size,
+            data: vec![0; n],
+            bucket: vec![0; bn]
+        }
+    }
+
+    fn less(&self, x: usize, default: usize) -> usize {
+        let bi = x / self.bucket_size;
+        for xi in (bi*self.bucket_size..x).rev() {
+            if self.data[xi] == 1 {
+                return xi;
+            }
+        }
+        for bi in (0..bi).rev() {
+            if self.bucket[bi] >= 1 {
+                let from = bi * self.bucket_size;
+                for xi in (from..min(from+self.bucket_size, self.n)).rev() {
+                    if self.data[xi] >= 1 {
+                        return xi;
+                    }
+                }
+            }
+        }
+        default
+    }
+
+    fn more(&self, x: usize, default: usize) -> usize {
+        let bi = x / self.bucket_size;
+        for bi in bi..self.bn {
+            if self.bucket[bi] >= 1 {
+                let from = bi * self.bucket_size;
+                for xi in max(x+1, from)..min(from+self.bucket_size, self.n) {
+                    if self.data[xi] >= 1 {
+                        return xi;
+                    }
+                }
+            }
+        }
+        default
+    }
+
+    fn add(&mut self, x: usize) {
+        self.bucket[x / self.bucket_size] += 1;
+        self.data[x] += 1;
+    }
+
+    fn remove(&mut self, x: usize) {
+        self.bucket[x / self.bucket_size] -= 1;
+        self.data[x] -= 1;
+    }
+}
 
 fn main() {
     let (n, m): (usize, usize) = read();
-    let distances: Vec<i64> = readnc();
-    let mut dimos: Vec<i64> = vec![];
-    dimos.push(0);
+    let dist: Vec<i64> = readnc();
 
-    let mut last: i64 = 0;
-    for di in distances {
-        last += di;
-        dimos.push(last);
-    }
+    let mut data: Vec<Vec<i64>> = vec![vec![0; n+3]; n+3];
 
-    let mut value: Vec<Vec<i32>> = vec![vec![0; n]; m];
+    let mut values: Vec<Vec<i32>> = vec![vec![0; n]; m];
     for i in 0..n {
-        let v: Vec<i32> = readnc();
+        let c: Vec<i32> = readnc();
         for j in 0..m {
-            value[j][i] = v[j];
+            values[j][i] = c[j];
         }
     }
 
-    let mut table: Vec<Vec<i64>> = vec![];
-    for i in 0..5005 {
-        table.push(vec![0; i+5]);
-    }
+    for i in 0..m {
+        let mut c: Vec<(i32, usize)> = values[i].clone().into_iter().zip(1..n+1).collect();
+        c.sort();
+        c.reverse();
 
-    let mut arr: Vec<bool> = vec![false; n];
-    let mut barr: Vec<bool> = vec![false; 75];
+        let mut bset = BucketArray::new(n+2);
+        bset.add(0);
+        bset.add(n+1);
 
-    for j in 0..m {
-        let val = &value[j];
-        let mut row: Vec<(&i32, usize)> = val.into_iter().zip((0..n).into_iter()).collect();
-        row.sort_by(|a, b| a.0.cmp(b.0));
-        row.reverse();
+        for ci in c {
+            let v = ci.0 as i64;
+            let idx = ci.1;
+            let fx = bset.less(idx, 0)+1;
+            let tx = idx+1;
 
-        for i in 0..n {
-            arr[i] = false;
-        }
-        for i in 0..75 {
-            barr[i] = false;
-        }
+            let fy = idx;
+            let ty = bset.more(idx, n+1);
 
-        for (&val, idx) in row {
-            let ty: i32 = larger((idx+1), &arr, &barr) as i32;
-            let fx: i32 = (smaller(idx, &arr, &barr) + 1) as i32;
-            let ty = ty as usize;
-            let fx = fx as usize;
+            data[fx][fy] += v;
+            data[tx][fy] -= v;
+            data[fx][ty] -= v;
+            data[tx][ty] += v;
 
-            let v = val as i64;
-            table[idx][fx] += v;
-            table[idx][idx+1] -= v;
-            table[ty][fx] -= v;
-            table[ty][idx+1] += v;
-
-            arr[idx] = true;
-            barr[idx / 75] = true;
+            bset.add(idx);
         }
     }
 
-    for i in 0..table.len() {
-        for j in 1..table[i].len() {
-            table[i][j] += table[i][j-1];
+    for i in 0..n+2 {
+        for j in 1..n+2 {
+            data[i][j] += data[i][j-1];
         }
     }
-    for j in 0..table.len() {
-        for i in 1..table.len() {
-            if j < table[i].len() && j < table[i-1].len() {
-                table[i][j] += table[i-1][j];
-            }
-        }
-    }
-
-    let mut ans: i64 = 0;
-    for i in 0..n {
-        for j in 0..(i+1) {
-            let d: i64 = (dimos[i] - dimos[j]) as i64;
-            ans = max(ans, table[i][j] - d);
+    for j in 0..n+2 {
+        for i in 1..n+2 {
+            data[i][j] += data[i-1][j];
         }
     }
 
+    let mut dx = vec![0; n];
+    for i in 1..n {
+        dx[i] += dx[i-1] + dist[i-1];
+    }
+
+    // 1 to n : 1 to n
+    let mut ans = 0;
+    for from in 1..n+1 {
+        for to in from..n+1 {
+            ans = max(ans, data[from][to] - (dx[to-1] - dx[from-1]));
+        }
+    }
     println!("{}", ans);
-}
-
-
-fn smaller(idx: usize, arr: &Vec<bool>, barr: &Vec<bool>) -> i32 {
-    let v = idx / 75;
-    for b in (0..(v+1)).rev() {
-        if barr[b] {
-            let from = min(idx, (b + 1) * 75);
-            let to = b * 75;
-            for i in (to..from).rev() {
-                if arr[i] {
-                    return i as i32;
-                }
-            }
-
-        }
-    }
-    -1
-}
-
-fn larger(idx: usize, arr: &Vec<bool>, barr: &Vec<bool>) -> i32 {
-    let v = idx / 75;
-    for b in v..(barr.len()) {
-        if barr[b] {
-            let from = max(idx, b * 75);
-            let to = min(arr.len(), (b + 1) * 75);
-            for i in from..to {
-                if arr[i] {
-                    return i as i32;
-                }
-            }
-
-        }
-    }
-    arr.len() as i32
 }
