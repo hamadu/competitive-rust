@@ -2,3 +2,5 @@
 **/*.rs.bk
 /.idea/
 /src/test.rs
+/competitive-rust.iml
+/.vscode/settings.json
