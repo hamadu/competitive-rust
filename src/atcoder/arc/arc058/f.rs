@@ -1,33 +1,33 @@
-#![allow(unused_imports, unused_variables, dead_code)]
+#![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
 use std::str::*;
 use std::cmp::*;
 use std::collections::*;
 
-trait InputValue {
+pub trait InputValue {
     fn parse(s: &str) -> Self;
 }
 
-fn read<T: InputValue>() -> T {
+pub fn read<T: InputValue>() -> T {
     let mut buf = String::new();
     let _ = stdin().read_line(&mut buf);
     T::parse(&buf.trim())
 }
 
-fn readnc<T: InputValue>() -> Vec<T> {
+pub fn readn<T: InputValue>(n: usize) -> Vec<T> {
     let mut vec = vec![];
-    let line: String = read();
-    for token in line.split_whitespace() {
-        vec.push(T::parse(token));
+    for _ in 0..n {
+        vec.push(read());
     }
     vec
 }
 
-fn readn<T: InputValue>(n: usize) -> Vec<T> {
+pub fn readnc<T: InputValue>() -> Vec<T> {
     let mut vec = vec![];
-    for _ in 0..n {
-        vec.push(read());
+    let line: String = read();
+    for token in line.split_whitespace() {
+        vec.push(T::parse(token));
     }
     vec
 }
@@ -56,139 +56,245 @@ macro_rules! parse_tuple {
 }
 parse_tuple!(A, B);
 parse_tuple!(A, B, C);
+parse_tuple!(A, B, C, D);
+parse_tuple!(A, B, C, D, E);
 
 // ===
+
+const INF: usize = 1000000;
 
 fn main() {
     let (n, k): (usize, usize) = read();
     let s: Vec<String> = readn(n);
     let s: Vec<Vec<u8>> = s.into_iter().map(|s| s.into_bytes()).collect();
 
-    let mut available: Vec<Vec<i32>> = vec![vec![0; k+1]; n+1];
-    available[n][k] = 1;
+    let mut can_make = vec![vec![false; k+1]; n+1];
+    can_make[n][k] = true;
+
     for i in (0..n).rev() {
-        let l = s[i].len();
+        let f = s[i].len();
         for j in 0..k+1 {
-            if available[i+1][j] == 1 || (j + l <= k && available[i+1][j+l] == 1) {
-                available[i][j] = 1;
+            if can_make[i+1][j] {
+                if j >= f {
+                    can_make[i][j-f] = true;
+                }
+                can_make[i][j] = true;
             }
         }
     }
-    assert!(available[0][0] == 1);
-
-    let mut prev: Vec<u8> = vec![];
-
-    let mut cut: Vec<bool> = vec![false; k+1];
-    cut[0] = true;
 
 
-    for i in 0..n {
-        let l = s[i].len();
-        let mut largest = k + 1;
-        for j in 0..k+1 {
-            if available[i+1][j] != 1 {
-                continue
-            }
+    let mut last: Vec<u8> = vec![];
+    for i in 1..n+1 {
+        // println!("===");
+        // println!("{:?}", can_make[i-1]);
+        // println!("{:?}", can_make[i]);
 
-            let left = j >= l && cut[j-l] && available[i][j-l] == 1;
-            if left {
-                let suffix = is_larger(&prev, &s[i], largest, j-l, k);
-                if suffix >= 0 {
-                    largest = j-l;
+        let f = s[i-1].len();
+        let mut cmp = s[i-1].clone();
+        cmp.append(&mut last.clone());
+        let z = z(&cmp);
+
+        let mut best_size = INF-1;
+        for j in f..k+1 {
+            if can_make[i][j] && can_make[i-1][j-f] {
+                //let rst = compare_naive(&z, &last, &s[i-1], best_size, j-f);
+                let rst = compare(&z, &last, &s[i-1], best_size, j-f);
+                if rst >= 0 {
+                    best_size = j-f;
                 }
             }
         }
 
-        if largest <= k {
-            let mut next: Vec<u8> = vec![];
-            for i in 0..largest {
-                next.push(prev[i]);
+        if best_size < INF-1 {
+            let mut next = vec![];
+            for i in 0..best_size {
+                next.push(last[i]);
             }
-            for &c in &s[i] {
+            for &c in &s[i-1] {
                 next.push(c);
             }
 
-            let mut next_cut: Vec<bool> = vec![false; k+1];
-            for x in 0..min(next.len(), prev.len())+1 {
-                next_cut[x] = cut[x];
-                if x >= min(next.len(), prev.len()) || prev[x] != next[x] {
-                    break;
+            // last[0..x]
+            // last[0..y] + s  のひかく
+
+            let nl = next.len();
+            for j in 0..k+1 {
+                if !can_make[i][j] {
+                    continue;
+                }
+                if j > nl {
+                    can_make[i][j] = false;
+                } else if j < nl {
+                    let lastn = last.len();
+                    let mut best = INF*2;
+
+                    if can_make[i-1][j] && j <= lastn {
+                        best = INF + j;
+                    }
+
+                    if j >= f && can_make[i-1][j-f] && j-f <= lastn {
+                        if best == INF*2 || compare(&z, &last, &s[i-1], best, j-f) >= 1 {
+                            best = j-f;
+                        }
+                    }
+
+                    if best == INF*2 || compare(&z, &last, &s[i-1], best, best_size) == 1 {
+                        can_make[i][j] = false;
+                    }
+
+                    // if next < z {
+                    //     if next.len() >= z.len() || next[..] < z[0..next.len()] {
+                    //         can_make[i][j] = false;
+                    //     }
+                    // }
                 }
             }
-            next_cut[0] = true;
-            next_cut[largest] = true;
-            next_cut[next.len()] = true;
-
-            for pi in 0..largest {
-                if !cut[pi] || available[i+1][pi+s[i].len()] == 0 {
-                    continue
-                }
-
-                let mut sub: Vec<u8> = vec![];
-                for l in 0..pi {
-                    sub.push(prev[l]);
-                }
-                for &c in &s[i] {
-                    sub.push(c);
-                }
-                if pi + s[i].len() <= next.len() && comp(&sub, &next) <= 0 {
-                    next_cut[pi+s[i].len()] = true;
-                }
+            last = next;
+        } else {
+            for j in 0..k+1 {
+                can_make[i][j] &= can_make[i-1][j];
             }
-
-
-//            println!("{}, {}, {}", i, next_cut[1], s[i][0] as char);
-//            for &c in &next {
-//                print!("{}", c as char);
-//            }
-//            println!();
-
-            prev = next;
-            cut = next_cut;
         }
     }
 
-    for c in prev {
-        print!("{}", c as char);
+    for i in 0..k {
+        print!("{}", last[i] as char);
     }
-    println!();
+    println!("");
 }
 
-// compare
-//   A = s[0..j) and
-//   B = s[0..j-t.len()) + t
-// returns true if B < A.
-fn is_larger(s: &Vec<u8>, t: &Vec<u8>, t1: usize, t2: usize, k: usize) -> i32 {
-    let mut wo2: Vec<u8> = vec![];
-    for i in 0..t2 {
-        wo2.push(s[i]);
-    }
-    for &c in t {
-        wo2.push(c);
-    }
-
-    let mut wo: Vec<u8> = vec![];
-
-    if t1 == k + 1 {
-        for &c in s {
-            wo.push(c);
+fn compare_u8(a: &Vec<u8>, b: &Vec<u8>) -> i32 {
+    let an = a.len();
+    let bn = b.len();
+    for i in 0..min(an, bn) {
+        if a[i] < b[i] { 
+            return -1;
+        } else if a[i] > b[i] {
+            return 1;
         }
+    }
+    return 1;
+}
+
+fn compare_naive(z: &Vec<usize>, last: &Vec<u8>, next: &Vec<u8>, a: usize, b: usize) -> i32 {
+    if b > last.len() {
+        return -1;
+    }
+    if a == INF-1 {
+        // last vs last[0,b] + next
+        let l: Vec<u8> = last[..].iter().cloned().collect();
+        let mut r: Vec<u8> = last[0..b].iter().cloned().collect();
+        r.append(&mut next.clone());
+        return compare_u8(&l, &r);
     } else {
-        for i in 0..t1 {
-            wo.push(s[i]);
-        }
-        for &c in t {
-            wo.push(c);
-        }
+        // last[0,a] + next vs 
+        let mut l: Vec<u8> = last[0..a].iter().cloned().collect();
+        let mut r: Vec<u8> = last[0..b].iter().cloned().collect();
+        l.append(&mut next.clone());
+        r.append(&mut next.clone());
+        return compare_u8(&l, &r);
     }
-    comp(&wo, &wo2)
 }
 
-fn comp(s: &Vec<u8>, t: &Vec<u8>) -> i32 {
-    for i in 0..min(s.len(), t.len()) {
-        if s[i] != t[i] {
-            return if t[i] < s[i] { 1 } else { -1 };
+// z := next + last
+fn compare(z: &Vec<usize>, last: &Vec<u8>, next: &Vec<u8>, a: usize, b: usize) -> i32 {
+    if b > last.len() {
+        return -1;
+    }
+    let n = z.len();
+    let nl = next.len();
+    if a >= INF {
+        // last[0, a-INF] vs last[0,b] + next
+        let a = a - INF;
+        let aidx = nl+a;
+        let bidx = nl+b;
+        if aidx <= bidx {
+            return 0;
+        } else {
+            // println!("{} - {} {} {}", bidx, z.len(), next.len(), last.len());
+            let zv = z[bidx];
+            if zv >= a-b {
+                return 0;
+            }
+            // println!("{} {} {}", b+zv, a, last.len());
+            return if next[zv] < last[b+zv] { 1 } else { -1 };
+        }
+    } else if a == INF-1 {
+        // last vs last[0,b] + next
+        let idx = nl + b;
+        if idx == z.len() {
+            return 0;
+        }
+        if b + z[idx] >= last.len() {
+            return 0;
+        }
+        if z[idx] >= next.len() {
+            return -1;
+        }
+        return if next[z[idx]] < last[b+z[idx]] { 1 } else { -1 };
+    }
+    if a == b {
+        return 0;
+    }
+    let diff = b-a;
+    if z[nl+a] >= diff {
+        // next[diff...] vs next[0...]
+        if z[diff] + diff >= nl {
+            return 0;
+        }
+        return if next[z[diff]] < next[diff+z[diff]] { 1 } else { -1 };
+
+        // if a + next.len() <= b {
+        //     return 0;
+        // }
+        // let l = a + next.len() - b;
+        // if z[next.len()-l] >= l {
+        //     return 0;
+        // }
+        // let zn = z[next.len()-l];
+        // return if next[zn] < next[next.len()-l+zn] { 1 } else { -1 } ;
+    } else {
+        let zn = z[nl+a];
+        if zn >= nl {
+            return 1;
+        }
+        return if last[a+zn] < next[zn] { 1 } else { -1 };
+    }
+}
+
+// (z[idx] := longest common prefix of ([idx,n), [0,n))
+fn z(a: &Vec<u8>) -> Vec<usize> {
+    let n = a.len();
+    let mut z = vec![0; n];
+    if n == 0 {
+        return z;
+    }
+    z[0] = n;
+    let mut l = 0;
+    let mut r = 0;
+    for i in 1..n {
+        if i > r {
+            l = i;
+            r = i;
+            while r < n && a[r-l] == a[r] {
+                r += 1;
+            }
+            z[i] = r - l;
+            r -= 1;
+        } else {
+            let k = i-l;
+            if z[k] < r-i+1 {
+                z[i] = z[k];
+            } else {
+                l = i;
+                while r < n && a[r-l] == a[r] {
+                    r += 1;
+                }
+                z[i] = r-l;
+                r -= 1;
+            }
         }
     }
-    return 0;
+    z
 }
