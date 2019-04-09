@@ -1,6 +1,9 @@
 /target/
+/test/
+*.out
 **/*.rs.bk
 /.idea/
 /src/test.rs
 /competitive-rust.iml
 /.vscode
+*.swp
