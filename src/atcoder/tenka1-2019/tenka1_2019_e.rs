@@ -1,4 +1,4 @@
-// https://atcoder.jp/contests/agc028/tasks/agc028_c
+// https://atcoder.jp/contests/tenka1-2019/tasks/tenka1_2019_e
 //
 #![allow(unused_imports)]
 use std::cmp::*;
@@ -63,56 +63,59 @@ macro_rules! debug {
     }
 }
 
-fn solve(v: Vec<(u64, u64)>) -> u64 {
-    let mut edges = vec![];
-    let n = v.len();
-    for i in 0..n {
-        edges.push((v[i].0, i, 0));
-        edges.push((v[i].1, i, 1));
+fn is_zero(a: &Vec<i32>, p: usize) -> bool {
+    let n = a.len();
+    if a[n - 1] % (p as i32) != 0 {
+        return false;
     }
-    edges.sort();
-
-    let mut ans = 0;
-    let mut flag = vec![0; n];
-    for i in 0..n {
-        ans += edges[i].0;
-        let idx = edges[i].1;
-        flag[idx] |= 1 << edges[i].2;
-    }
-
-    let mut types = vec![0; 4];
-    for i in 0..n {
-        types[flag[i]] += 1;
-    }
-
-    assert!(types[0] == types[3]);
-
-    if types[1] == n || types[2] == n {
-        return ans;
-    }
-    if types[0] >= 1 {
-        return ans;
-    }
-
-    let mut best = std::u64::MAX;
-    for i in n - 2..n {
-        let eidx = edges[i].1;
-        for j in n..2 * n {
-            if edges[j].1 != eidx {
-                best = min(best, ans + edges[j].0 - edges[i].0);
-                break;
-            }
+    for i in 1..p {
+        let mut sum = 0;
+        let mut j = i;
+        while j < n {
+            sum += a[n - 1 - j];
+            j += p - 1;
+        }
+        if sum.abs() % (p as i32) != 0 {
+            return false;
         }
     }
-    return best;
+    return true;
+}
+
+fn gcd(a: usize, b: usize) -> usize {
+    return if a % b == 0 { b } else { gcd(b, a % b) };
 }
 
 fn main() {
     input! {
         n: usize,
-        v: [(u64, u64); n]
+        a: [i32; n+1]
     };
 
-    let ans = solve(v);
-    println!("{}", ans);
+    let mut g = a[0].abs() as usize;
+    for i in 1..n + 1 {
+        if a[i] != 0 {
+            g = gcd(g, a[i].abs() as usize);
+        }
+    }
+
+    let mut isp = vec![true; 500000];
+    for p in 2..isp.len() {
+        if isp[p] {
+            let mut pp = p * 2;
+            while pp < isp.len() {
+                isp[pp] = false;
+                pp += p;
+            }
+            if is_zero(&a, p) {
+                println!("{}", p);
+            }
+            while g % p == 0 {
+                g /= p;
+            }
+        }
+    }
+    if g >= 2 {
+        println!("{}", g);
+    }
 }

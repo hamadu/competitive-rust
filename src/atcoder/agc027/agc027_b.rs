@@ -1,4 +1,4 @@
-// https://atcoder.jp/contests/agc028/tasks/agc028_c
+// https://atcoder.jp/contests/agc027/tasks/agc027_b
 //
 #![allow(unused_imports)]
 use std::cmp::*;
@@ -63,56 +63,52 @@ macro_rules! debug {
     }
 }
 
-fn solve(v: Vec<(u64, u64)>) -> u64 {
-    let mut edges = vec![];
-    let n = v.len();
-    for i in 0..n {
-        edges.push((v[i].0, i, 0));
-        edges.push((v[i].1, i, 1));
-    }
-    edges.sort();
-
-    let mut ans = 0;
-    let mut flag = vec![0; n];
-    for i in 0..n {
-        ans += edges[i].0;
-        let idx = edges[i].1;
-        flag[idx] |= 1 << edges[i].2;
-    }
-
-    let mut types = vec![0; 4];
-    for i in 0..n {
-        types[flag[i]] += 1;
-    }
-
-    assert!(types[0] == types[3]);
-
-    if types[1] == n || types[2] == n {
-        return ans;
-    }
-    if types[0] >= 1 {
-        return ans;
-    }
-
-    let mut best = std::u64::MAX;
-    for i in n - 2..n {
-        let eidx = edges[i].1;
-        for j in n..2 * n {
-            if edges[j].1 != eidx {
-                best = min(best, ans + edges[j].0 - edges[i].0);
-                break;
-            }
-        }
-    }
-    return best;
-}
+// fn range_cost(l: usize, r: usize, sum: &Vec<Vec<u64>>) -> u64 {
+//     let s = sum[1][r] - sum[1][l];
+//     let t = sum[0][r] - sum[0][l];
+//     s - t * l as u64 * 2
+// }
 
 fn main() {
     input! {
-        n: usize,
-        v: [(u64, u64); n]
+        n: usize, t: u64,
+        x: [u64; n]
     };
 
-    let ans = solve(v);
+    let mut sum = vec![0; n + 1];
+    for i in 1..n + 1 {
+        let s0 = sum[i - 1];
+        sum[i] = s0 + x[i - 1];
+    }
+
+    let mut ans = 1e18 as u64;
+    let base_cost = sum[n] * 5 + t * (n as u64);
+
+    for cur in 1..n + 1 {
+        if cur * 2 > n {
+            let mut cost = cur as u64 * t;
+            ans = min(ans, cost);
+            break;
+        }
+        let left = n - cur * 2;
+
+        let dan = left / cur;
+        let par = left % cur;
+
+        assert!(par + dan * cur == left);
+
+        let mut cost = 0;
+        if par >= 1 {
+            cost += (2 * (dan + 1)) as u64 * sum[par];
+        }
+        for d in 0..dan {
+            let l = par + cur * d;
+            let r = par + cur * (d + 1);
+            cost += (2 * (dan - d)) as u64 * (sum[r] - sum[l]);
+        }
+        cost += cur as u64 * t;
+        ans = min(ans, cost);
+    }
+    ans += base_cost;
     println!("{}", ans);
 }

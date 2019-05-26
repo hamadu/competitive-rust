@@ -1,11 +1,11 @@
-// https://atcoder.jp/contests/agc028/tasks/agc028_c
+// https://atcoder.jp/contests/agc026/tasks/agc026_b
 //
 #![allow(unused_imports)]
+use std::io::*;
+use std::fmt::*;
+use std::str::*;
 use std::cmp::*;
 use std::collections::*;
-use std::fmt::*;
-use std::io::*;
-use std::str::*;
 
 macro_rules! input {
     (source = $s:expr, $($r:tt)*) => {
@@ -63,56 +63,54 @@ macro_rules! debug {
     }
 }
 
-fn solve(v: Vec<(u64, u64)>) -> u64 {
-    let mut edges = vec![];
-    let n = v.len();
-    for i in 0..n {
-        edges.push((v[i].0, i, 0));
-        edges.push((v[i].1, i, 1));
+fn isok((initial, purchase, threshold, fill): (i64, i64, i64, i64)) -> bool {
+    if purchase > fill || purchase > initial {
+        return false;
     }
-    edges.sort();
-
-    let mut ans = 0;
-    let mut flag = vec![0; n];
-    for i in 0..n {
-        ans += edges[i].0;
-        let idx = edges[i].1;
-        flag[idx] |= 1 << edges[i].2;
+    if threshold >= purchase-1 {
+        return true;
     }
 
-    let mut types = vec![0; 4];
-    for i in 0..n {
-        types[flag[i]] += 1;
-    }
+    // initial >= purchase > threshold
+    assert!(initial >= purchase);
+    assert!(purchase > threshold);
 
-    assert!(types[0] == types[3]);
+    let g = gcd(purchase, fill);
+    let tot = initial - threshold;
+    let mx = tot / g;
 
-    if types[1] == n || types[2] == n {
-        return ans;
+    let mut left = initial - mx * g;
+    if left == threshold {
+        left += g;
     }
-    if types[0] >= 1 {
-        return ans;
-    }
+    // threshold < left
+    assert!(threshold < left);
 
-    let mut best = std::u64::MAX;
-    for i in n - 2..n {
-        let eidx = edges[i].1;
-        for j in n..2 * n {
-            if edges[j].1 != eidx {
-                best = min(best, ans + edges[j].0 - edges[i].0);
-                break;
-            }
-        }
+    if left < purchase {
+        return false;
     }
-    return best;
+    true
+}
+
+fn gcd(a: i64, b: i64) -> i64 {
+    if b == 0 {
+        a
+    } else {
+        gcd(b, a%b)
+    }
 }
 
 fn main() {
     input! {
-        n: usize,
-        v: [(u64, u64); n]
+        t: usize,
+        tests: [(i64, i64, i64, i64); t]
     };
 
-    let ans = solve(v);
-    println!("{}", ans);
+    for t in tests {
+        if isok(t) {
+            println!("Yes");
+        } else {
+            println!("No");
+        }
+    }
 }

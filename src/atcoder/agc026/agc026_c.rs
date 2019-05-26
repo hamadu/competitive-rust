@@ -1,11 +1,11 @@
-// https://atcoder.jp/contests/agc028/tasks/agc028_c
+// https://atcoder.jp/contests/agc026/tasks/agc026_c
 //
 #![allow(unused_imports)]
+use std::io::*;
+use std::fmt::*;
+use std::str::*;
 use std::cmp::*;
 use std::collections::*;
-use std::fmt::*;
-use std::io::*;
-use std::str::*;
 
 macro_rules! input {
     (source = $s:expr, $($r:tt)*) => {
@@ -63,56 +63,49 @@ macro_rules! debug {
     }
 }
 
-fn solve(v: Vec<(u64, u64)>) -> u64 {
-    let mut edges = vec![];
-    let n = v.len();
-    for i in 0..n {
-        edges.push((v[i].0, i, 0));
-        edges.push((v[i].1, i, 1));
-    }
-    edges.sort();
-
-    let mut ans = 0;
-    let mut flag = vec![0; n];
-    for i in 0..n {
-        ans += edges[i].0;
-        let idx = edges[i].1;
-        flag[idx] |= 1 << edges[i].2;
-    }
-
-    let mut types = vec![0; 4];
-    for i in 0..n {
-        types[flag[i]] += 1;
-    }
-
-    assert!(types[0] == types[3]);
-
-    if types[1] == n || types[2] == n {
-        return ans;
-    }
-    if types[0] >= 1 {
-        return ans;
-    }
-
-    let mut best = std::u64::MAX;
-    for i in n - 2..n {
-        let eidx = edges[i].1;
-        for j in n..2 * n {
-            if edges[j].1 != eidx {
-                best = min(best, ans + edges[j].0 - edges[i].0);
-                break;
+fn compute(a: Vec<char>) -> HashMap<(Vec<char>, Vec<char>), u64> {
+    let mut map = HashMap::new();
+    let n = a.len();
+    for p in 0..(1<<n) {
+        let mut red = vec![];
+        let mut blue = vec![];
+        for i in 0..n {
+            if p & (1<<i) == 0 {
+                red.push(a[i]);
+            } else {
+                blue.push(a[i]);
             }
+
         }
+        let pair = (red, blue);
+        let cnt = *(map.get(&pair).unwrap_or(&0)) + 1;
+        map.insert(pair, cnt);
     }
-    return best;
+    map
 }
 
 fn main() {
     input! {
         n: usize,
-        v: [(u64, u64); n]
+        s: chars
     };
 
-    let ans = solve(v);
+    let mut left = vec!['-'; n];
+    let mut right = vec!['-'; n];
+
+    left.copy_from_slice(&s[0..n]);
+    right.copy_from_slice(&s[n..2*n]);
+    right.reverse();
+
+    let leftMap = compute(left);
+    let rightMap = compute(right);
+
+    let mut ans = 0;
+    for ((l, r), lways) in leftMap {
+        let rways = *rightMap.get(&(r.to_vec(), l.to_vec())).unwrap_or(&0);
+        ans += lways * rways;
+    }
+
+    // ABcd|DCba
     println!("{}", ans);
 }

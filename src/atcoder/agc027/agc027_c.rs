@@ -1,4 +1,4 @@
-// https://atcoder.jp/contests/agc028/tasks/agc028_c
+// https://atcoder.jp/contests/agc027/tasks/agc027_c
 //
 #![allow(unused_imports)]
 use std::cmp::*;
@@ -63,56 +63,81 @@ macro_rules! debug {
     }
 }
 
-fn solve(v: Vec<(u64, u64)>) -> u64 {
-    let mut edges = vec![];
-    let n = v.len();
+
+fn has_cycle(graph: Vec<Vec<usize>>) -> bool {
+    let n = graph.len();
+    let mut indeg = vec![0; n];
     for i in 0..n {
-        edges.push((v[i].0, i, 0));
-        edges.push((v[i].1, i, 1));
+        for &j in graph[i].iter() {
+            indeg[j] += 1;
+        }
     }
-    edges.sort();
 
-    let mut ans = 0;
-    let mut flag = vec![0; n];
+    let mut deq = VecDeque::new();
+    let mut cnt = 0;
     for i in 0..n {
-        ans += edges[i].0;
-        let idx = edges[i].1;
-        flag[idx] |= 1 << edges[i].2;
+        if indeg[i] == 0 {
+            deq.push_back(i);
+            cnt += 1;
+        }
     }
 
-    let mut types = vec![0; 4];
-    for i in 0..n {
-        types[flag[i]] += 1;
-    }
-
-    assert!(types[0] == types[3]);
-
-    if types[1] == n || types[2] == n {
-        return ans;
-    }
-    if types[0] >= 1 {
-        return ans;
-    }
-
-    let mut best = std::u64::MAX;
-    for i in n - 2..n {
-        let eidx = edges[i].1;
-        for j in n..2 * n {
-            if edges[j].1 != eidx {
-                best = min(best, ans + edges[j].0 - edges[i].0);
-                break;
+    while deq.len() >= 1 {
+        let u = deq.pop_front().unwrap();
+        for &j in graph[u].iter() {
+            indeg[j] -= 1;
+            if indeg[j] == 0 {
+                deq.push_back(j);
+                cnt += 1;
             }
         }
     }
-    return best;
+    return cnt != n;
 }
 
 fn main() {
     input! {
-        n: usize,
-        v: [(u64, u64); n]
+        n: usize, m: usize,
+        s: chars,
+        edges: [(usize1, usize1); m]
     };
 
-    let ans = solve(v);
-    println!("{}", ans);
+
+    let mut snum = vec![0; n];
+    for i in 0..n {
+        if s[i] == 'B' {
+            snum[i] = 1;
+        }
+    }
+
+    let mut graph = vec![vec![]; n];
+    for &(u, v) in edges.iter() {
+        if u == v {
+            graph[u].push(v);
+        } else {
+            graph[u].push(v);
+            graph[v].push(u);
+        }
+    }
+
+    let mut dgraph = vec![vec![]; 2*n];
+    for i in 0..n {
+        for &t in graph[i].iter() {
+            // i*2(R,R) -> t*2(R,B)
+            // i*2+1(B,R) -> t*2(R,B)
+            let tt = t*2 + (snum[i] ^ snum[t] ^ 1);
+            if snum[t] == snum[i] {
+                dgraph[i*2].push(tt);
+            }
+            if snum[t] != snum[i] {
+                dgraph[i*2+1].push(tt);
+            }
+        }
+    }
+
+    if has_cycle(dgraph) {
+        println!("Yes");
+    } else {
+        println!("No");
+    }
 }
