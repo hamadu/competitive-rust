@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc133/tasks/abc133_d
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -55,17 +57,6 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -74,8 +65,38 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        a: [i64; n]
     };
 
-    println!("ok");
+    let pl = a[0]*2;
+    let mut mi = 0;
+
+    {
+        let mut i = 0;
+        let mut j = 1;
+        loop {
+            mi += (a[i]-a[j])*2;
+            if j == 0 {
+                break;
+            }
+            i = (i+2)%n;
+            j = (j+2)%n;
+        }
+    }
+
+    let mut ans = vec![0; n];
+    ans[0] = (pl+mi)/2;
+
+    for i in 1..n {
+        ans[i] = (a[i-1] - ans[i-1]/2) * 2;
+    }
+
+    for i in 0..n {
+        if i >= 1 {
+            print!(" ");
+        }
+        print!("{}", ans[i]);
+    }
+    println!();
 }

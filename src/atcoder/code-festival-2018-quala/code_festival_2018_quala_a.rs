@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/code-festival-2018-quala/tasks/code_festival_2018_quala_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,12 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        a: i32, b: i32, c: i32, s: i32,
     };
 
-    println!("ok");
+    if a+b+c <= s && s <= a+b+c+3 {
+        println!("Yes");
+    } else {
+        println!("No");
+    }
 }

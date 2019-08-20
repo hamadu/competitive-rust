@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/dwacon5th-prelims/tasks/dwacon5th_prelims_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -72,10 +74,59 @@ macro_rules! debug {
     }
 }
 
+fn solve(width: usize, s: &Vec<char>, sum_m: &Vec<i64>) -> i64 {
+    let n = s.len();
+    let mut from = 0;
+    let mut to = 0;
+    let mut total = 0;
+
+    let mut ds = 0;
+    let mut dms = 0;
+    while from < n {
+        while to < n && to - from < width {
+            // add to
+            match s[to] {
+                'D' => {
+                    ds += 1;
+                },
+                'M' => {
+                    dms += ds;
+                },
+                'C' => {
+                    total += dms;
+                },
+                _ => {},
+            };
+            to += 1;
+        }
+        // remove from
+        if s[from] == 'D' {
+            ds -= 1;
+            dms -= sum_m[to] - sum_m[from];
+        }
+        from += 1;
+    }
+    total
+}
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, s: chars,
+        q: usize,
+        queries: [usize; q],
     };
 
-    println!("ok");
+    let mut sum_m = vec![0; n+1];
+    for i in 0..n {
+        let w = sum_m[i];
+        if s[i] == 'M' {
+            sum_m[i+1] = w+1;
+        } else {
+            sum_m[i+1] = w;
+        }
+    }
+
+    for q in queries {
+        println!("{}", solve(q, &s, &sum_m));
+    }
 }

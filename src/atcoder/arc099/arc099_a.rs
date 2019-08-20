@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/arc099/tasks/arc099_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,26 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, k: usize,
+        a: [i32; n]
     };
 
-    println!("ok");
+    let mut total = n;
+    for i in 0..n {
+        if a[i] == 1 {
+            for (left,right) in vec![(i, n-i-1), (n-i-1, i)] {
+                let pw = left % (k - 1);
+                let left = left - pw;
+                let right = if pw >= 1 { right - (k - 1 - pw) } else { right };
+                let mut t = left  / (k - 1) + (right + k - 2) / (k - 1);
+                if pw >= 1 {
+                    t += 1;
+                }
+                total = min(total, t);
+            }
+            break;
+        }
+    }
+
+    println!("{}", total);
 }

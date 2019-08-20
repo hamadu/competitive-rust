@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/arc084/tasks/arc084_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,29 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        a: [i32; n],
+        b: [i32; n],
+        c: [i32; n]
     };
 
-    println!("ok");
+    let (mut a, mut b, mut c) = (a, b, c);
+    a.sort();
+    b.sort();
+    c.sort();
+
+    let mut ai = 0;
+    let mut ci = 0;
+    let mut ans = 0i64;
+    for i in 0..n {
+        let center = b[i];
+        while ai < n && a[ai] < center {
+            ai += 1;
+        }
+        while ci < n && c[ci] <= center {
+            ci += 1;
+        }
+        ans += (ai as i64) * (n - ci) as i64;
+    }
+    println!("{}", ans);
 }

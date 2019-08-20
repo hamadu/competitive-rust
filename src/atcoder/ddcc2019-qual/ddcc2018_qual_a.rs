@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/ddcc2019-qual/tasks/ddcc2018_qual_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,11 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: i32
     };
-
-    println!("ok");
+    let mut a = 1;
+    for i in 0..n {
+        a *= 4;
+    }
+    println!("{}", a);
 }

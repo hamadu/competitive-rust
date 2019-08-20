@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc033/tasks/agc033_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -55,27 +57,54 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
     }
 }
 
+type V = usize;
+type Graph = Vec<Vec<V>>;
+
+fn diameter(g: Graph) -> usize {
+    let (best_leaf, _) = dfs(&g, 0, g.len());
+    let (_, diameter) = dfs(&g, best_leaf, g.len());
+    diameter
+}
+
+fn dfs(g: &Graph, v: V, p: V) -> (V, usize) {
+    let mut best_depth = 0;
+    let mut best_leaf = v;
+    for &t in &g[v] {
+        if t == p {
+            continue;
+        }
+        let (l, d) = dfs(g, t, v);
+        if best_depth < d+1 {
+            best_depth = d+1;
+            best_leaf = l;
+        }
+    }
+    (best_leaf, best_depth)
+}
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        edges: [(usize1, usize1); n-1]
     };
 
-    println!("ok");
+    let mut g = vec![vec![]; n];
+    for e in edges {
+        g[e.0].push(e.1);
+        g[e.1].push(e.0);
+    }
+
+    let d = diameter(g);
+    if (d+2) % 3 == 0 {
+        println!("Second");
+    } else {
+        println!("First");
+    }
 }
+

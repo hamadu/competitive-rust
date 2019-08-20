@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/code-festival-2018-quala/tasks/code_festival_2018_quala_b
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,20 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, m: usize, a: i32, b: i32,
+        rules: [(usize, usize); m]
     };
 
-    println!("ok");
+    let mut mikan = vec![b; n];
+    for (l,r) in rules {
+        for i in l..r+1 {
+            mikan[i-1] = a;
+        }
+    }
+
+    let mut sum = 0;
+    for i in 0..n {
+        sum += mikan[i];
+    }
+    println!("{}", sum);
 }

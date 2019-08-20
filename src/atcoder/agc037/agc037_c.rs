@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc037/tasks/agc037_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -72,10 +74,57 @@ macro_rules! debug {
     }
 }
 
+fn solve(mut a: Vec<i64>, mut b: Vec<i64>) -> i64 {
+    let n = a.len();
+    for i in 0..n {
+        if b[i] < a[i] {
+            return -1;
+        }
+    }
+    let mut pq = BinaryHeap::new();
+    for i in 0..n {
+        if a[i] < b[i] {
+            pq.push((b[i], i));
+        }
+    }
+
+    let mut step = 0;
+    while let Some((mut v, i)) = pq.pop() {
+        let lr = b[(i+1)%n] + b[(i+n-1)%n];
+        if lr > v {
+            return -1;
+        }
+        assert!(a[i] < b[i]);
+        assert!(b[i] == v);
+        let sage = v - a[i];
+        let k = sage / lr;
+        if k == 0 {
+            return -1;
+        }
+        v -= lr * k;
+        b[i] = v;
+        if a[i] > b[i] {
+            return -1;
+        } else if a[i] < b[i] {
+            pq.push((b[i], i));
+        }
+        step += k;
+    }
+
+    for i in 0..n {
+        if a[i] != b[i] {
+            return -1;
+        }
+    }
+    step
+}
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        a: [i64; n],
+        b: [i64; n]
     };
 
-    println!("ok");
+    println!("{}", solve(a, b));
 }

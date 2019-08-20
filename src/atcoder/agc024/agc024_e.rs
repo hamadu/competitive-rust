@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc024/tasks/agc024_e
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -55,17 +57,6 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -74,8 +65,41 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, k: usize, MOD: usize
     };
 
-    println!("ok");
+   let mut comb = vec![vec![0; n+2]; n+2];
+    for i in 0..n+2 {
+        comb[i][0] = 1;
+        comb[i][i] = 1;
+        for j in 1..i {
+            comb[i][j] = (comb[i-1][j-1] + comb[i-1][j]) % MOD;
+        }
+    }
+
+    let mut dp = vec![vec![0; k+1]; n+2];
+    for i in 0..k+1 {
+        dp[1][i] = 1;
+    }
+
+
+    let mut dp_sum = vec![vec![0; k+2]; n+2];
+    for i in 2..n+2 {
+        for j in 0..k+1 {
+            let p = dp_sum[i-1][j];
+            dp_sum[i-1][j+1] = (p + dp[i-1][j]) % MOD;
+        }
+
+        for j in 0..k+1 {
+            let mut total = 0;
+            for w in 1..i {
+                total += (MOD + dp_sum[w][k+1] - dp_sum[w][j+1]) % MOD * dp[i-w][j] % MOD * comb[i-2][w-1] % MOD;
+                total %= MOD;
+            }
+            dp[i][j] = total;
+            // dp[i][j] = sum(k, c(>j)) { dp[i-k][c] * dp[k][j] )
+        }
+    }
+
+    println!("{}", dp[n+1][0]);
 }

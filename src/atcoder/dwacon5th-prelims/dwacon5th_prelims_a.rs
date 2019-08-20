@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/dwacon5th-prelims/tasks/dwacon5th_prelims_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,11 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        a: [i32; n],
     };
 
-    println!("ok");
+    let sum = a.iter().fold(0, |sum, x| sum + x);
+    let best = a.iter().map(|&ai| (sum-ai*(n as i32)).abs()).zip(0..).min().unwrap();
+    println!("{}", best.1);
 }

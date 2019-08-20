@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc133/tasks/abc133_b
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -55,27 +57,35 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
     }
 }
 
+fn has_integer_distance(a: &Vec<i64>, b: &Vec<i64>) -> bool {
+    let n = a.len();
+    let mut dist2 = 0;
+    for i in 0..n {
+        dist2 += (a[i]-b[i])*(a[i]-b[i]);
+    }
+    let d = (dist2 as f64).sqrt() as i64;
+    d * d == dist2
+}
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, d: usize,
+        points: [[i64; d]; n]
     };
 
-    println!("ok");
+    let mut pair = 0;
+    for i in 0..n {
+        for j in i+1..n {
+            if has_integer_distance(&points[i], &points[j]) {
+                pair += 1;
+            }
+        }
+    }
+    println!("{}", pair);
 }

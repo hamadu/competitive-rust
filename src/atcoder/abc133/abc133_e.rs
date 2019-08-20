@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc133/tasks/abc133_e
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -55,27 +57,49 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
     }
 }
 
+const MOD: i64 = 1e9 as i64 + 7;
+
+fn dfs(graph: &Vec<Vec<usize>>, now: usize, par: usize, k: i64) -> i64 {
+    let mut ways = 1;
+    let mut colors = 0;
+    if par == graph.len() {
+        colors = k-1;
+    } else {
+        colors = k-2;
+    }
+    for &to in &graph[now] {
+        if to == par {
+            continue;
+        }
+        ways *= colors;
+        ways %= MOD;
+        ways *= dfs(graph, to, now, k);
+        ways %= MOD;
+        if colors == 0 {
+            break;
+        }
+        colors -= 1;
+    }
+    ways
+}
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, k: i64,
+        edges: [(usize1, usize1); n-1]
     };
 
-    println!("ok");
+    let mut graph = vec![vec![]; n];
+    for e in edges {
+        graph[e.0].push(e.1);
+        graph[e.1].push(e.0);
+    }
+
+    println!("{}", k * dfs(&graph, 0, n, k) % MOD);
 }

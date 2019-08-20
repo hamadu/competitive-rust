@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/arc084/tasks/arc084_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -72,10 +74,61 @@ macro_rules! debug {
     }
 }
 
+fn gen(i: usize, n: usize, k: usize, history: Vec<usize>, all: &mut Vec<Vec<usize>>) {
+    if history.len() >= 1 {
+        all.push(history.clone());
+    }
+    if i == n {
+        return;
+    }
+    for x in 1..k+1 {
+        let mut th = history.clone();
+        th.push(x);
+        gen(i+1, n, k, th, all);
+    }
+}
+
+fn rollback(a: &mut Vec<usize>, k: usize, n: usize) {
+    let last = a.len()-1;
+    if a[last] == 1 {
+        a.pop();
+    } else {
+        a[last] -= 1;
+        while a.len() < n {
+            a.push(k);
+        }
+    }
+}
+
 fn main() {
     input! {
-        n: usize, m: usize
+        k: usize, n: usize
     };
 
-    println!("ok");
+    let mut ans = vec![];
+    if k % 2 == 0 {
+        ans.push(k/2);
+        for i in 1..n {
+            ans.push(k);
+        }
+    } else {
+        for i in 0..n {
+            ans.push((k+1)/2);
+        }
+        let back = n/2;
+        for i in 0..back {
+            rollback(&mut ans, k, n);
+        }
+    }
+
+    // let mut a = vec![];
+    // gen(0, n, k, vec![], &mut a);
+    // a.sort();
+
+    // let len = a.len();
+    // debug!(len, a[(len+1)/2-1]);
+    // assert_eq!(ans, a[(len+1)/2-1]);
+
+    let line = ans.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(" ");
+    println!("{}", line);
 }

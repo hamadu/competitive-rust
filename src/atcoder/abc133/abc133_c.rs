@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc133/tasks/abc133_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -55,17 +57,6 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -74,8 +65,17 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        l: i64, r: i64
     };
 
-    println!("ok");
+    let mut best = 2019;
+    for i in l..min(r+1, l+2019) {
+        for j in max(l, r-2019)..r+1 {
+            if i == j {
+                continue;
+            }
+            best = min(best, i*j%2019);
+        }
+    }
+    println!("{}", best);
 }

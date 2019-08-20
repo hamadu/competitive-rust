@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc021/tasks/agc021_d
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -55,17 +57,6 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -74,8 +65,52 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        s: chars,
+        c: usize
     };
 
-    println!("ok");
+    let n = s.len();
+
+    let mut dp = vec![vec![vec![-1; c+1]; n+1]; n];
+    dp[0][n-1][0] = 0;
+    for i in 0..n {
+        for j in (0..n).rev() {
+            if i > j {
+                continue;
+            }
+            for k in 0..c+1 {
+                let base = dp[i][j][k];
+                if base == -1 {
+                    continue;
+                }
+
+                if i == j {
+                    dp[0][n][k] = max(dp[0][n][k], base+1);
+                    continue;
+                }
+
+                if s[i] == s[j] {
+                    dp[i+1][j-1][k] = max(dp[i+1][j-1][k], base+2);
+                } else if k+1 <= c {
+                    dp[i+1][j-1][k+1] = max(dp[i+1][j-1][k+1], base+2);
+                }
+                if i+1 < n {
+                    dp[i+1][j][k] = max(dp[i+1][j][k], base);
+                }
+                if j-1 >= 0 {
+                    dp[i][j-1][k] = max(dp[i][j-1][k], base);
+                }
+            }
+        }
+    }
+
+    let mut ans = 0;
+    for i in 0..n {
+        for j in 0..n+1 {
+            for k in 0..c+1 {
+                ans = max(ans, dp[i][j][k]);
+            }
+        }
+    }
+    println!("{}", ans);
 }

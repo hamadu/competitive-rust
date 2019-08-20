@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/dwacon5th-prelims/tasks/dwacon5th_prelims_e
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -72,10 +74,33 @@ macro_rules! debug {
     }
 }
 
+const MOD: i64 = 998244353;
+
+fn gcd(a: i64, b: i64) -> i64 {
+    if b == 0 {
+        a
+    } else {
+        gcd(b, a%b)
+    }
+}
+
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        a: [i64; n]
     };
+    let mut a = a;
+    a.sort();
 
-    println!("ok");
+    let mut total = 1;
+    for i in 0..n {
+        if i == 0 {
+            total *= a[i];
+        } else {
+            total *= gcd(a[i], i as i64);
+        }
+        total %= MOD;
+    }
+    println!("{}", total);
 }

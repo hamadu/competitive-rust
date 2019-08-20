@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/code-festival-2018-qualb/tasks/code_festival_2018_qualb_d
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,58 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, m: usize, q: f64,
+        rates: [(f64, f64); m]
     };
 
-    println!("ok");
+    let mut psum = vec![0f64; m+1];
+    for i in 0..m {
+        let p = rates[i].1 / q;
+        psum[i+1] = psum[i] + p;
+    }
+
+    let mut fact_ln = vec![0f64; n+1];
+    fact_ln[0] = 1f64.ln();
+    for i in 1..n+1 {
+        fact_ln[i] = fact_ln[i-1] + (i as f64).ln();
+    }
+
+    let mut distributions = dvec!(0.0; n, m+1);
+    for i in 0..n {
+        let lnum = i as f64;
+        let rnum = (n-i) as f64;
+        distributions[i][0] = 1f64;
+        for j in 1..m {
+            let left = psum[j].ln();
+            let right = (1f64 - psum[j]).ln();
+            distributions[i][j] = (left * lnum + right * rnum + fact_ln[n] - fact_ln[i] - fact_ln[n-i]).exp();
+        }
+    }
+    for i in 0..n-1 {
+        for j in 1..m {
+            distributions[i+1][j] += distributions[i][j];
+        }
+    }
+
+    // debug!(distributions);
+
+    let mut ans = 0f64;
+    for i in 0..n {
+        let mut center = -1f64;
+        let mut sum_prob = 0f64;
+        for j in 0..m {
+            let prob = distributions[i][j] - distributions[i][j+1];
+            sum_prob += prob;
+            if sum_prob >= 0.5 && center == -1f64 {
+                center = rates[j].0;
+            }
+        }
+        for j in 0..m {
+            let prob = distributions[i][j] - distributions[i][j+1];
+            ans += (center - rates[j].0).abs() * prob;
+        }
+    }
+
+
+    println!("{}", ans);
 }

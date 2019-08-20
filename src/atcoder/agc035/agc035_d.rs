@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc035/tasks/agc035_d
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -32,6 +34,16 @@ macro_rules! input_inner {
     };
 }
 
+macro_rules! dvec {
+    ($t:expr ; $len:expr) => {
+        vec![$t; $len]
+    };
+
+    ($t:expr ; $len:expr, $($rest:expr),*) => {
+        vec![dvec!($t; $($rest),*); $len]
+    };
+}
+
 macro_rules! read_value {
     ($iter:expr, ( $($t:tt),* )) => {
         ( $(read_value!($iter, $t)),* )
@@ -55,27 +67,58 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
     }
 }
 
+const INF: i64 = 1e18 as i64;
+
+struct Solver {
+    n: usize,
+    a: Vec<i64>,
+    memo: Vec<Vec<HashMap<i64,i64>>>
+}
+
+impl Solver {
+    fn new(a: Vec<i64>) -> Self {
+        let n = a.len();
+        Solver {
+            n: n,
+            a: a,
+            memo: dvec!(HashMap::new(); n, n)
+        }
+    }
+
+    fn solve(&mut self, l: usize, r: usize, al: i64, ar: i64) -> i64 {
+        let key = (al<<16)+ar;
+        if self.memo[l][r].contains_key(&key) {
+            return *self.memo[l][r].get(&key).unwrap();
+        }
+        let mut ans = INF;
+        if l + 1 == r {
+            ans = 0;
+        } else {
+            for i in l+1..r {
+                let left = self.solve(l, i, al, al+ar);
+                let right = self.solve(i, r, al+ar, ar);
+                ans = min(ans, self.a[i] * (al + ar) + left + right);
+            }
+        }
+        self.memo[l][r].insert(key, ans);
+        ans
+    }
+}
+
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        a: [i64; n],
     };
 
-    println!("ok");
+    let ini = a[0] + a[n-1];
+    let mut solver = Solver::new(a);
+    println!("{}", solver.solve(0, n-1, 1, 1) + ini);
 }

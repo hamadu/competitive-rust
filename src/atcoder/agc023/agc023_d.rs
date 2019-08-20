@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc023/tasks/agc023_d
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -55,17 +57,6 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -74,8 +65,52 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, s: i64,
+        a: [(i64, u64); n]
     };
 
-    println!("ok");
+    let mut left = VecDeque::new();
+    let mut right = VecDeque::new();
+    for &m in &a {
+        if m.0 < s {
+            left.push_front(m);
+        } else {
+            right.push_back(m);
+        }
+    }
+    // debug!(left, right);
+
+    let mut ans = 0;
+
+    let mut dir = 0;
+    while true {
+        if left.len() == 0 {
+            let rr = right.pop_back().unwrap();
+            ans += rr.0 - s;
+            break;
+        } else if right.len() == 0 {
+            let ll = left.pop_back().unwrap();
+            ans += s - ll.0;
+            break;
+        } else {
+            let mut ll = left.pop_back().unwrap();
+            let mut rr = right.pop_back().unwrap();
+            if ll.1 >= rr.1 {
+                if dir != 1 {
+                    ans += rr.0 - ll.0;
+                }
+                dir = 1;
+                ll.1 += rr.1;
+                left.push_back(ll);
+            } else {
+                if dir != -1 {
+                    ans += rr.0 - ll.0;
+                }
+                dir = -1;
+                rr.1 += ll.1;
+                right.push_back(rr);
+            }
+        }
+    }
+    println!("{}", ans);
 }

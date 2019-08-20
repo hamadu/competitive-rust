@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc022/tasks/agc022_e
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -55,27 +57,58 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
     }
 }
 
+const MOD: u64 = 1e9 as u64 + 7;
+
 fn main() {
     input! {
-        n: usize, m: usize
+        s: chars
     };
+    let n = s.len();
 
-    println!("ok");
+    let mut dp = vec![vec![0; 8]; n+1];
+
+    dp[0][0] = 1;
+    for i in 0..n {
+        for j in 0..8 {
+            let base = dp[i][j];
+            let last = j & 1;
+            let has_one = j & 2;
+            let has_two = j & 4;
+
+            for w in 0..2 {
+                if s[i] == '1' && w == 0 {
+                    continue;
+                }
+                if s[i] == '0' && w == 1 {
+                    continue;
+                }
+
+
+                let mut tj = has_one | has_two | w;
+                if i == 0 && w == 1 {
+                    tj |= 2;
+                }
+                if i >= 1 && w == 1 && last == 1 {
+                    if (i-1)%2 == 1 {
+                        tj |= 2;
+                    } else if (tj & 2) == 2 {
+                        tj |= 4;
+                    }
+                }
+                if i == n-1 && w == 1 && (tj & 2) == 2 {
+                    tj |= 4;
+                }
+                dp[i+1][tj] += base;
+                dp[i+1][tj] %= MOD;
+            }
+        }
+    }
+
+    println!("{}", (dp[n][6] +dp[n][7]) % MOD);
 }

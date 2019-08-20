@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/m-solutions2019/tasks/m_solutions2019_e
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -72,10 +74,58 @@ macro_rules! debug {
     }
 }
 
+
+const MOD: usize = 1e6 as usize + 3;
+
+fn powmod(a: usize, p: usize, m: usize) -> usize {
+    let mut ret = 1usize;
+    let mut aa = a;
+    let mut pp = p;
+    while pp >= 1 {
+        if pp & 1 == 1 {
+            ret *= aa;
+            ret %= m;
+        }
+        aa = aa * aa % m;
+        pp >>= 1;
+    }
+    ret
+}
+
+fn inv(a: usize, m: usize) -> usize {
+    powmod(a, m-2, m)
+}
+
+fn go(from: usize, n: usize, tbl: &Vec<usize>) -> usize {
+    assert!(from >= 1);
+    if from + n - 1 >= MOD {
+        return 0;
+    }
+    tbl[from+n-1] * inv(tbl[from-1], MOD) % MOD
+}
+
 fn main() {
     input! {
-        n: usize, m: usize
+        q: usize,
+        queries: [(usize, usize, usize); q]
     };
 
-    println!("ok");
+    let mut tbl = vec![0; MOD];
+    tbl[0] = 0;
+    tbl[1] = 1;
+    for i in 2..MOD {
+        tbl[i] = tbl[i-1] * i % MOD;
+    }
+
+    for &(x, d, n) in &queries {
+        if x == 0 {
+            println!("{}", 0);
+        } else if d == 0 {
+            println!("{}", powmod(x, n, MOD) % MOD);
+        } else {
+            let from = x * inv(d, MOD) % MOD;
+            let pw = powmod(d, n, MOD);
+            println!("{}", go(from, n, &tbl) * pw % MOD);
+        }
+    }
 }

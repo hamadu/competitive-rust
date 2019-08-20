@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc036/tasks/agc036_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -32,6 +34,17 @@ macro_rules! input_inner {
     };
 }
 
+#[allow(unused_macros)]
+macro_rules! dvec {
+    ($t:expr ; $len:expr) => {
+        vec![$t; $len]
+    };
+
+    ($t:expr ; $len:expr, $($rest:expr),*) => {
+        vec![dvec!($t; $($rest),*); $len]
+    };
+}
+
 macro_rules! read_value {
     ($iter:expr, ( $($t:tt),* )) => {
         ( $(read_value!($iter, $t)),* )
@@ -55,17 +68,6 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -74,8 +76,17 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        s: i64,
     };
 
-    println!("ok");
+    let a = 1000000000;
+    let b = 1;
+    let d = (s + a - 1) / a;
+    let c = (a - (s % a)) % a;
+
+    // (0,0),(a,b),(c,d)
+    // s=|ad-bc|
+    // println!("{}", a*d-b*c);
+
+    println!("0 0 {} {} {} {}", a, b, c, d);
 }

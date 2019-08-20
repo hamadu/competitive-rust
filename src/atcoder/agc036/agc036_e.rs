@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc036/tasks/agc036_e
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,9 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        s: chars
     };
+    let n = s.len();
 
-    println!("ok");
+    println!("{}", n);
 }

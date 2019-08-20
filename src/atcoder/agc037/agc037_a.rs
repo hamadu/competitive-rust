@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc037/tasks/agc037_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,38 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        s: chars
     };
 
-    println!("ok");
+    let n = s.len();
+    let mut dp = dvec!(-1; n+1, 2);
+    dp[0][0] = 0;
+    for i in 0..n {
+        for j in 0..2 {
+            if dp[i][j] == -1 {
+                continue;
+            }
+            let base = dp[i][j];
+            let p = if i <= 1 { ' ' } else { s[i-2] };
+            let q = if i <= 0 { ' ' } else { s[i-1] };
+
+            for tj in 0..2 {
+                let ti = i+tj+1;
+                if ti > n {
+                    continue;
+                }
+                if j == tj {
+                    if j == 0 && q == s[i] {
+                        continue;
+                    }
+                    if j == 1 && p == s[i] && q == s[i+1] {
+                        continue;
+                    }
+                }
+                dp[ti][tj] = max(dp[ti][tj], base+1);
+            }
+        }
+    }
+
+    println!("{}", max(dp[n][0], dp[n][1]));
 }

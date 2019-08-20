@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc035/tasks/agc035_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -32,6 +34,17 @@ macro_rules! input_inner {
     };
 }
 
+#[allow(unused_macros)]
+macro_rules! dvec {
+    ($t:expr ; $len:expr) => {
+        vec![$t; $len]
+    };
+
+    ($t:expr ; $len:expr, $($rest:expr),*) => {
+        vec![dvec!($t; $($rest),*); $len]
+    };
+}
+
 macro_rules! read_value {
     ($iter:expr, ( $($t:tt),* )) => {
         ( $(read_value!($iter, $t)),* )
@@ -55,27 +68,60 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
     }
 }
 
+fn isok(n: usize, map: HashMap<i32, usize>) -> bool {
+    let mut values = vec![];
+    let mut keys = vec![];
+    for &k in map.keys() {
+        keys.push(k);
+        values.push(*map.get(&k).unwrap());
+    }
+    if values.len() == 1 {
+        return keys[0] == 0;
+    }
+    if n % 3 != 0 {
+        return false;
+    }
+    if values.len() >= 4 {
+        return false;
+    }
+    let n3 = n / 3;
+    if values.len() == 2 {
+        if values[0] == n3 * 2 && values[1] == n3 {
+            return keys[1] == 0;
+        } else if values[1] == n3 * 2 && values[0] == n3 {
+            return keys[0] == 0;
+        }
+    } else {
+        // 3
+        if keys[0] ^ keys[1] == keys[2] {
+            return values[0] == n3 && values[1] == n3 && values[2] == n3;
+        }
+    }
+    false
+}
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        a: [i32; n],
     };
 
-    println!("ok");
+    let mut a = a;
+    let mut map = HashMap::new();
+    for i in 0..n {
+        let &c = map.get(&a[i]).unwrap_or(&0);
+        map.insert(a[i], c+1);
+    }
+
+    if isok(n, map) {
+        println!("Yes");
+    } else {
+        println!("No");
+    }
 }

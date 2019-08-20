@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/code-festival-2018-quala/tasks/code_festival_2018_quala_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -72,10 +74,53 @@ macro_rules! debug {
     }
 }
 
+const MOD: i64 = 1000000007;
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, k: usize,
+        a: [i64; n],
     };
 
-    println!("ok");
+    let mut variance = vec![0; n];
+    for i in 0..n {
+        let mut aa = a[i];
+        while aa >= 1 {
+            variance[i] += 1;
+            aa /= 2;
+        }
+    }
+
+    // println!("{:?}", variance);
+
+    let mut dp = dvec!(0; n+1, 2, 3100);
+    dp[0][0][0] = 1;
+    for i in 0..n {
+        for f in 0..2 {
+            for w in 0..3100 {
+                let base = dp[i][f][w];
+                if base == 0 {
+                    continue;
+                }
+
+                for z in 0..variance[i]+1 {
+                    let mut tf = f;
+                    if z == variance[i] {
+                        tf = 1;
+                    }
+                    dp[i+1][tf][w+z] += base;
+                    dp[i+1][tf][w+z] %= MOD;
+                }
+            }
+        }
+    }
+
+    let mut sum = 0;
+    for i in 0..min(3100, k) {
+        sum += dp[n][1][i];
+    }
+    if k < 3100 {
+        sum += dp[n][0][k] + dp[n][1][k];
+    }
+    println!("{}", sum % MOD);
 }

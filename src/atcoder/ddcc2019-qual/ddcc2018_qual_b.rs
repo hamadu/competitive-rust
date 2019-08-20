@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/ddcc2019-qual/tasks/ddcc2018_qual_b
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -72,10 +74,29 @@ macro_rules! debug {
     }
 }
 
+fn is_black(i: usize, j: usize, n: usize) -> bool {
+    if i * 2 == n {
+        return true;
+    }
+    if i * 2 < n {
+        n - i * 2 <= j * 2 && j * 2 <= n + i * 2
+    } else {
+        (i * 2 - n) <= j * 2 && j * 2 <= 3 * n - i * 2
+    }
+}
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize
     };
 
-    println!("ok");
+    let mut sum = 0;
+    for i in 0..n {
+        for j in 0..n {
+            if is_black(i, j, n) && is_black(i+1, j, n) && is_black(i, j+1, n) && is_black(i+1, j+1, n) {
+                sum += 1;
+            }
+        }
+    }
+    println!("{}", sum);
 }

@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc024/tasks/agc024_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -55,17 +57,6 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -74,8 +65,30 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        a: [i64; n]
     };
 
-    println!("ok");
+
+    let mut total = 0;
+    let mut last = 0;
+    let mut isok = a[0] == 0;
+    for i in (0..n).rev() {
+        if last <= 1 {
+            total += a[i];
+        } else if last - 1 == a[i] {
+            // ok
+        } else if last <= a[i] {
+            total += a[i];
+        } else {
+            isok = false;
+        }
+        last = a[i];
+    }
+
+    if !isok {
+        println!("-1");
+    } else {
+        println!("{}", total);
+    }
 }

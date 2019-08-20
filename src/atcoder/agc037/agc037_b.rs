@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc037/tasks/agc037_b
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -72,10 +74,54 @@ macro_rules! debug {
     }
 }
 
+const MOD: u64 = 998244353;
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: u64,
+        s: chars
     };
 
-    println!("ok");
+    let mut total = 1u64;
+    let mut state = vec![0u64; 8];
+    state[0] = n as u64;
+    for i in 0..s.len() {
+        let v = match s[i] {
+            'R' => 1,
+            'G' => 2,
+            'B' => 4,
+             _  => unreachable!("invalid color")
+        };
+        let w0 = 7 ^ v; // people don't have v
+        if state[w0] >= 1 {
+            total *= state[w0];
+            total %= MOD;
+            state[w0] -= 1;
+            state[w0^v] += 1;
+            continue;
+        }
+
+        let mut has1 = false;
+        for w1 in vec![6 ^ v, 5 ^ v, 3 ^ v] {
+            if w1 != 7 && state[w1] >= 1 {
+                has1 = true;
+                total *= state[w1];
+                total %= MOD;
+                state[w1] -= 1;
+                state[w1^v] += 1;
+                break;
+            }
+        }
+        if has1 {
+            continue;
+        }
+
+        assert!(state[0] >= 1);
+        total *= state[0];
+        total %= MOD;
+        state[0] -= 1;
+        state[v] += 1;
+    }
+    println!("{}", total);
 }
+

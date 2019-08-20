@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/ddcc2019-qual/tasks/ddcc2018_qual_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -72,10 +74,46 @@ macro_rules! debug {
     }
 }
 
+const MOD: i64 = 1e9 as i64 + 7;
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize
     };
 
-    println!("ok");
+    let mut c = dvec!(0; 30, 30);
+    for i in 0..c.len() {
+        c[i][0] = 1;
+        c[i][i] = 1;
+        for j in 1..i {
+            c[i][j] = (c[i-1][j-1] + c[i-1][j]) % MOD;
+        }
+    }
+
+    let mut ways = vec![0i64; n+1];
+    ways[1] = 1;
+    for p in 2..n+1 {
+        let mut total = 0;
+        let mut wo = 1;
+        for s in 0..10 {
+            total += wo * c[10][s];
+            total %= MOD;
+            wo *= (p-1) as i64;
+            wo %= MOD;
+        }
+        ways[p] = total;
+    }
+
+    let mut ans = 0;
+    for i in 1..n+1 {
+        for j in 1..n+1 {
+            if i * j > n {
+                break;
+            }
+            ans += ways[i] * ways[j] % MOD;
+            ans %= MOD;
+        }
+    }
+
+    println!("{}", ans);
 }

@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/m-solutions2019/tasks/m_solutions2019_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,7 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize
     };
-
-    println!("ok");
+    println!("{}", (n-2)*180);
 }

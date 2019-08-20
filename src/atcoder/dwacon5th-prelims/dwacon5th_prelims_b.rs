@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/dwacon5th-prelims/tasks/dwacon5th_prelims_b
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,35 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, k: usize,
+        a: [i64; n]
     };
 
-    println!("ok");
+    let mut subarrays = vec![];
+    for i in 0..n {
+        let mut sum = 0;
+        for j in i..n {
+            sum += a[j];
+            subarrays.push(sum);
+        }
+    }
+
+
+    let mut ans = 0;
+    for i in (0..41).rev() {
+        // debug!(subarrays, i);
+        let mask = 1<<i;
+        let mut next = vec![];
+        for &s in &subarrays {
+            if (s & mask) == mask {
+                next.push(s);
+            }
+        }
+        if next.len() >= k {
+            ans |= mask;
+            subarrays = next;
+        }
+
+    }
+    println!("{}", ans);
 }

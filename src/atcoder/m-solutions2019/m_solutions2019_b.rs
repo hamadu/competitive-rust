@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/m-solutions2019/tasks/m_solutions2019_b
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,13 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        s: chars
     };
+    let win = (15-s.len()) + s.into_iter().filter(|&c| c == 'o').collect::<Vec<_>>().len();
 
-    println!("ok");
+    if win >= 8 {
+        println!("YES");
+    } else {
+        println!("NO");
+    }
 }

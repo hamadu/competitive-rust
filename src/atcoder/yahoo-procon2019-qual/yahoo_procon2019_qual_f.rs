@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/yahoo-procon2019-qual/tasks/yahoo_procon2019_qual_f
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -72,10 +74,49 @@ macro_rules! debug {
     }
 }
 
+fn ctou(c: char) -> usize {
+    match c {
+        '0' => 0,
+        '1' => 1,
+        '2' => 2,
+        _ => panic!("no"),
+    }
+}
+
+const MOD: i64 = 998244353;
+
 fn main() {
     input! {
-        n: usize, m: usize
+        s: chars
     };
 
-    println!("ok");
+    let n = s.len();
+    let mut dp = dvec![0; 2*n+1, 2*n+1];
+
+    dp[0][0] = 1;
+    let mut blue = 0;
+    let mut red = 0;
+    for i in 0..2*n {
+        if i < n {
+            blue += ctou(s[i]);
+            red += 2-ctou(s[i]);
+        }
+        for j in 0..2*n+1 {
+            let base = dp[i][j];
+            if base == 0 {
+                continue;
+            }
+
+            if j < blue {
+                dp[i+1][j+1] += base;
+                dp[i+1][j+1] %= MOD;
+            }
+            if (i-j) < red {
+                dp[i+1][j] += base;
+                dp[i+1][j] %= MOD;
+            }
+        }
+    }
+
+    println!("{}", dp[2*n][blue]);
 }

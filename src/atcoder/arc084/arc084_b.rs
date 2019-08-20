@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/arc084/tasks/arc084_b
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,27 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        k: usize
     };
 
-    println!("ok");
+    let mut dp = vec![1e9 as i64; k];
+    let mut q = VecDeque::new();
+
+    dp[1] = 1;
+    q.push_back((1, 1i64));
+
+    while let Some((modulo, keta)) = q.pop_front() {
+        let m10 = modulo * 10 % k;
+        if dp[m10] > keta {
+            dp[m10] = keta;
+            q.push_front((m10, keta));
+        }
+        let mp1 = (modulo + 1) % k;
+        if dp[mp1] > keta+1 {
+            dp[mp1] = keta+1;
+            q.push_back((mp1, keta+1));
+        }
+    }
+
+    println!("{}", dp[0]);
 }

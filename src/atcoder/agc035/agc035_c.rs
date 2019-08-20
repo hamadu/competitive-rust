@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/agc035/tasks/agc035_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -32,6 +34,17 @@ macro_rules! input_inner {
     };
 }
 
+#[allow(unused_macros)]
+macro_rules! dvec {
+    ($t:expr ; $len:expr) => {
+        vec![$t; $len]
+    };
+
+    ($t:expr ; $len:expr, $($rest:expr),*) => {
+        vec![dvec!($t; $($rest),*); $len]
+    };
+}
+
 macro_rules! read_value {
     ($iter:expr, ( $($t:tt),* )) => {
         ( $(read_value!($iter, $t)),* )
@@ -55,17 +68,6 @@ macro_rules! read_value {
 }
 
 #[allow(unused_macros)]
-macro_rules! dvec {
-    ($t:expr ; $len:expr) => {
-        vec![$t; $len]
-    };
-
-    ($t:expr ; $len:expr, $($rest:expr),*) => {
-        vec![dvec!($t; $($rest),*); $len]
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -74,8 +76,50 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
     };
 
-    println!("ok");
+    let mut nn = n;
+    while nn > 1 && nn % 2 == 0 {
+        nn /= 2;
+    }
+    if nn == 1 {
+        println!("No");
+        return;
+    }
+
+
+    let mut edges = vec![];
+    edges.push((1, 2));
+    edges.push((2, 3));
+    edges.push((3, n+1));
+    edges.push((n+1, n+2));
+    edges.push((n+2, n+3));
+
+    let mut k = 5;
+    while k <= n {
+        let l = k-1;
+        edges.push((1, l));
+        edges.push((l, k));
+        edges.push((1, n+k));
+        edges.push((n+k, n+l));
+        k += 2;
+    }
+    if n % 2 == 0 {
+        let mut w = 2;
+        loop {
+            if n & w == w {
+                let c = n - w;
+                edges.push((w, n));
+                edges.push((n+c+1, 2*n));
+                break;
+            }
+            w <<= 1;
+        }
+    }
+
+    println!("Yes");
+    for &e in &edges {
+        println!("{} {}", e.0, e.1);
+    }
 }

@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/m-solutions2019/tasks/m_solutions2019_d
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -74,8 +76,38 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        edges: [(usize1, usize1); n-1],
+        c: [u64; n],
     };
+    let mut c = c;
+    c.sort();
 
-    println!("ok");
+    let mut g = vec![vec![]; n];
+    for &(u, v) in &edges {
+        g[u].push(v);
+        g[v].push(u);
+    }
+
+    let mut visited = vec![false; n];
+    visited[0] = true;
+    let mut deq = VecDeque::new();
+    deq.push_back(0);
+
+    let mut ans = vec![0; n];
+    while let Some(now) = deq.pop_front() {
+        ans[now] = c.pop().unwrap();
+        for &to in &g[now] {
+            if visited[to] {
+                continue;
+            }
+            visited[to] = true;
+            deq.push_back(to);
+        }
+    }
+
+    let total = ans.iter().fold(0, |a, c| a + c) - ans[0];
+    let line = ans.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(" ");
+    println!("{}", total);
+    println!("{}", line);
 }

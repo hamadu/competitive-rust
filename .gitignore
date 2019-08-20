@@ -8,3 +8,5 @@
 /.vscode
 *.swp
 *.dSYM/
+/src/main.rs
+/out.txt
