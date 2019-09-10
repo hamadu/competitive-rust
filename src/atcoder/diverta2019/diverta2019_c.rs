@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/diverta2019/tasks/diverta2019_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -66,22 +68,6 @@ macro_rules! dvec {
 }
 
 #[allow(unused_macros)]
-macro_rules! ifv {
-    ($t:expr, $a:expr, $b: expr) => {
-        if $t { $a } else { $b }
-    }
-}
-
-#[allow(unused_macros)]
-macro_rules! fill {
-    ($t:expr, $v:expr) => {
-        for i in 0..$t.len() {
-            $t[i] = $v;
-        }
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -90,9 +76,35 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, s: [chars; n]
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut begin_b = 0;
+    let mut end_a = 0;
+    let mut both = 0;
+    let mut total = 0;
+
+    for i in 0..n {
+        let m = s[i].len();
+        for j in 0..m-1 {
+            if s[i][j] == 'A' && s[i][j+1] == 'B' {
+                total += 1;
+            }
+        }
+        if s[i][0] == 'B' {
+            begin_b += 1;
+        }
+        if s[i][m-1] == 'A' {
+            end_a += 1;
+        }
+        if s[i][0] == 'B' && s[i][m-1] == 'A' {
+            both += 1;
+        }
+    }
+
+    total += min(begin_b, end_a);
+    if min(begin_b, end_a) >= 1 && begin_b == end_a && begin_b == both {
+        total -= 1;
+    }
+    println!("{}", total);
 }

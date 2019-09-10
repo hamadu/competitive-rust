@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc128/tasks/abc128_b
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -90,9 +92,12 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        restaurants: [(chars, i32); n]
     };
-
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut restaurants = restaurants.into_iter().zip(0..n).map(|(r, idx)| (r.0, -r.1, idx)).collect::<Vec<_>>();
+    restaurants.sort();
+    for r in restaurants {
+        println!("{}", r.2+1);
+    }
 }

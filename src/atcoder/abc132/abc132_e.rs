@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc132/tasks/abc132_e
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -73,26 +75,44 @@ macro_rules! ifv {
 }
 
 #[allow(unused_macros)]
-macro_rules! fill {
-    ($t:expr, $v:expr) => {
-        for i in 0..$t.len() {
-            $t[i] = $v;
-        }
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
     }
 }
 
+
+const INF: i64 = 1e18 as i64;
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, m: usize,
+        edges: [(usize1, usize1); m],
+        s: usize1, t: usize1
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut graph = vec![vec![]; 3*n];
+    for e in edges {
+        for w in 0..3 {
+            let from = e.0 * 3 + w;
+            let to = e.1 * 3 + (w + 1) % 3;
+            graph[from].push(to);
+        }
+    }
+
+    let mut dp = vec![INF; 3*n];
+    dp[s*3] = 0;
+    let mut deq = VecDeque::new();
+    deq.push_back(s*3);
+    while deq.len() >= 1 {
+        let v = deq.pop_front().unwrap();
+        let time = dp[v];
+        for &to in &graph[v] {
+            if dp[to] > time+1 {
+                dp[to] = time+1;
+                deq.push_back(to);
+            }
+        }
+    }
+    println!("{}", ifv!(dp[t*3] == INF, -1, dp[t*3]/3));
 }

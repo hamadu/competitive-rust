@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc136/tasks/abc136_e
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -66,33 +68,67 @@ macro_rules! dvec {
 }
 
 #[allow(unused_macros)]
-macro_rules! ifv {
-    ($t:expr, $a:expr, $b: expr) => {
-        if $t { $a } else { $b }
-    }
-}
-
-#[allow(unused_macros)]
-macro_rules! fill {
-    ($t:expr, $v:expr) => {
-        for i in 0..$t.len() {
-            $t[i] = $v;
-        }
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
     }
 }
 
+fn isok(a: &Vec<i32>, d: i32, k: i32) -> bool {
+    let n = a.len();
+    let mut modulo = vec![];
+    for ai in a {
+        if ai % d >= 1 {
+            modulo.push(ai%d);
+        }
+    }
+    modulo.sort();
+
+    let n = modulo.len();
+    let mut sum = vec![0; n+1];
+    for i in 0..n {
+        sum[i+1] = sum[i] + modulo[i];
+    }
+
+    for w in 1..n {
+        let mut dw = sum[w];
+        let mut up = ((n-w) as i32) * d - (sum[n] - sum[w]);
+        if dw == up && dw <= k {
+            return true;
+        }
+    }
+    false
+}
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, k: i32,
+        a: [i32; n]
     };
+    let sum = a.iter().fold(0, |a,c| a+c);
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut divisors = vec![];
+    for w in 1..sum+1 {
+        if w * w >= sum {
+            if w * w == sum {
+                divisors.push(w);
+            }
+            break;
+        }
+        if sum % w == 0 {
+            divisors.push(sum/w);
+            divisors.push(w);
+        }
+    }
+    divisors.sort();
+    divisors.reverse();
+
+    let mut ans = 1;
+    for d in divisors {
+        if isok(&a, d, k) {
+            ans = d;
+            break;
+        }
+    }
+    println!("{}", ans);
 }

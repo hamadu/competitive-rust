@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc128/tasks/abc128_e
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -39,6 +41,13 @@ macro_rules! read_value {
 
     ($iter:expr, [ $t:tt ; $len:expr ]) => {
         (0..$len).map(|_| read_value!($iter, $t)).collect::<Vec<_>>()
+    };
+
+    ($iter:expr, [ next / $t:tt ]) => {
+        {
+            let len = read_value!($iter, usize);
+            (0..len).map(|_| read_value!($iter, $t)).collect::<Vec<_>>()
+        }
     };
 
     ($iter:expr, chars) => {
@@ -90,9 +99,53 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, q: usize,
+        roadworks: [(i64, i64, i64); n],
+        queries: [i64; q]
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut events = vec![];
+    for i in 0..q {
+        events.push((queries[i], 2, 0));
+    }
+    for i in 0..n {
+        let f = roadworks[i].0-roadworks[i].2;
+        let t = roadworks[i].1-roadworks[i].2;
+        events.push((f, 1, roadworks[i].2));
+        events.push((t, 0, roadworks[i].2));
+    }
+    events.sort();
+    // debug!(events);
+
+    let mut que = BinaryHeap::new();
+    let mut rem = HashSet::new();
+    for (at, qtype, position) in events {
+        match qtype {
+            0 => {
+                rem.insert(position);
+            },
+            1 => {
+                que.push(-position);
+                rem.remove(&position);
+            },
+            2 => {
+                let mut has = false;
+                while let Some(w) = que.pop() {
+                    let w = -w;
+                    if rem.contains(&w) {
+                        continue;
+                    } else {
+                        has = true;
+                        println!("{}", w);
+                        que.push(-w);
+                        break;
+                    }
+                }
+                if !has {
+                    println!("-1");
+                }
+            },
+            _ => unreachable!("invalid query type")
+        }
+    }
 }

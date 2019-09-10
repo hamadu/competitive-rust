@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc131/tasks/abc131_f
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -88,11 +90,83 @@ macro_rules! debug {
     }
 }
 
+struct UnionFind {
+      n: usize,
+      parent: Vec<usize>,
+      count: Vec<usize>
+}
+
+impl UnionFind {
+     fn new(n: usize) -> Self {
+           let mut p = vec![0; n];
+           for i in 0..n {
+                 p[i] = i;
+           }
+           UnionFind { n: n, parent: p, count: vec![1; n] }
+     }
+
+     fn find(&mut self, a: usize) -> usize {
+           if self.parent[a] == a {
+                 return a;
+           }
+           let par = self.parent[a];
+           self.parent[a] = self.find(par);
+           self.parent[a]
+     }
+
+     fn unite(&mut self, a: usize, b: usize) {
+           let a = self.find(a);
+           let b = self.find(b);
+           if a == b {
+                 return;
+           }
+           let ca = self.count[a];
+           let cb = self.count[b];
+           let total = ca + cb;
+           self.count[b] = total;
+           self.count[a] = total;
+           if ca < cb {
+                 self.parent[a] = b;
+           } else {
+                 self.parent[b] = a;
+           }
+     }
+
+     fn same(&mut self, a: usize, b: usize) -> bool {
+           self.find(a) == self.find(b)
+     }
+
+     fn count(&mut self, a: usize) -> usize {
+           let a = self.find(a);
+           self.count[a]
+     }
+}
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        points: [(usize1, usize1); n]
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let max = 100000;
+    let mut uf = UnionFind::new(max*2);
+    for p in points {
+        uf.unite(p.0, p.1+max);
+    }
+
+    let mut x = vec![0i64; max*2];
+    let mut y = vec![0i64; max*2];
+    for i in 0..max*2 {
+        let id = uf.find(i);
+        if i < max {
+            x[id] += 1;
+        } else {
+            y[id] += 1;
+        }
+    }
+    let mut total = 0;
+    for i in 0..max*2 {
+        total += x[i] * y[i];
+    }
+    println!("{}", total - n as i64);
 }

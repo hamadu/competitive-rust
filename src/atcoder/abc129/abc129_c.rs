@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc129/tasks/abc129_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -88,11 +90,27 @@ macro_rules! debug {
     }
 }
 
+const MOD: i64 = 1e9 as i64 + 7;
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, m: usize,
+        a: [usize; m]
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut broken = vec![false; n+1];
+    for ai in a {
+        broken[ai] = true;
+    }
+    let mut dp = vec![0; n+1];
+    dp[0] = 1;
+    for i in 1..n+1 {
+        if broken[i] {
+            continue;
+        }
+        dp[i] = ifv!(i >= 1, dp[i-1], 0) + ifv!(i >= 2, dp[i-2], 0);
+        dp[i] %= MOD;
+    }
+
+    println!("{}", dp[n]);
 }

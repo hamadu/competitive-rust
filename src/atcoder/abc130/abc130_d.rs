@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc130/tasks/abc130_d
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -90,9 +92,25 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, k: i64,
+        a: [i64; n]
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut sum = vec![0; n+1];
+    for i in 0..n {
+        sum[i+1] = sum[i] + a[i];
+    }
+
+    let mut to = 0;
+    let mut ans = 0i64;
+    for fr in 0..n {
+        while to < n && sum[to] - sum[fr] < k {
+            to += 1;
+        }
+        if sum[to] - sum[fr] < k {
+            break;
+        }
+        ans += (n+1-to) as i64;
+    }
+    println!("{}", ans);
 }

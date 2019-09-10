@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc128/tasks/abc128_f
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -39,6 +41,13 @@ macro_rules! read_value {
 
     ($iter:expr, [ $t:tt ; $len:expr ]) => {
         (0..$len).map(|_| read_value!($iter, $t)).collect::<Vec<_>>()
+    };
+
+    ($iter:expr, [ next / $t:tt ]) => {
+        {
+            let len = read_value!($iter, usize);
+            (0..len).map(|_| read_value!($iter, $t)).collect::<Vec<_>>()
+        }
     };
 
     ($iter:expr, chars) => {
@@ -90,9 +99,41 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, s: [i64; n]
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut best = s[n-1];
+    let mut visited = vec![0; n];
+    for d in 1..n {
+        let mut total = s[n-1];
+        let mut low = 0;
+        let mut high = n-1;
+        while true {
+            if high <= d*2 || low+d*2 >= n-1 {
+                break;
+            }
+            high -= d;
+            low += d;
+            if high == low {
+                break;
+            }
+            if visited[high] != d {
+                visited[high] = d;
+            } else {
+                break;
+            }
+            if visited[low] != d {
+                visited[low] = d;
+            } else {
+                break;
+            }
+
+            total += s[high];
+            total += s[low];
+            best = max(best, total);
+            // debug!(d, high, low, best);
+        }
+    }
+
+    println!("{}", best);
 }

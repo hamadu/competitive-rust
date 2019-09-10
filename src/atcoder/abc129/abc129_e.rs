@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc129/tasks/abc129_e
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -88,11 +90,42 @@ macro_rules! debug {
     }
 }
 
+const MOD: i64 = 1e9 as i64 + 7;
+
 fn main() {
     input! {
-        n: usize, m: usize
+        l: chars
     };
+    let mut l = l;
+    l.reverse();
+    let n = l.len();
+    let mut dp = dvec!(0; n+1, 2);
+    dp[n][0] = 1;
+    for i in (1..n+1).rev() {
+        for f in 0..2 {
+            let base = dp[i][f];
+            if base == 0 {
+                continue;
+            }
+            for a in 0..2 {
+                for b in 0..2 {
+                    if a + b == 2 {
+                        continue;
+                    }
+                    if f == 0 && a + b == 1 && l[i-1] == '0' {
+                        continue;
+                    }
+                    let mut tf = f;
+                    if a + b == 0 && l[i-1] == '1' {
+                        tf = 1;
+                    }
+                    dp[i-1][tf] += base;
+                    dp[i-1][tf] %= MOD;
+                }
+            }
+        }
+    }
+    // debug!(dp);
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    println!("{}", (dp[0][0] + dp[0][1]) % MOD);
 }

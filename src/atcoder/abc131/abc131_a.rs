@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc131/tasks/abc131_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -90,9 +92,8 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        s: chars
     };
-
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let bad = s[0] == s[1] || s[1] == s[2] || s[2] == s[3];
+    println!("{}", ifv!(bad, "Bad", "Good"));
 }

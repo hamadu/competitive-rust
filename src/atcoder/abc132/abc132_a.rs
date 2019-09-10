@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc132/tasks/abc132_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -72,14 +74,6 @@ macro_rules! ifv {
     }
 }
 
-#[allow(unused_macros)]
-macro_rules! fill {
-    ($t:expr, $v:expr) => {
-        for i in 0..$t.len() {
-            $t[i] = $v;
-        }
-    };
-}
 
 #[allow(unused_macros)]
 macro_rules! debug {
@@ -90,9 +84,19 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        s: chars
     };
+    let mut mp = HashMap::new();
+    for si in s {
+        let v = *mp.get(&si).unwrap_or(&0);
+        mp.insert(si, v+1);
+    }
+    let mut ok = mp.len() == 2;
+    for (k, v) in mp {
+        if v != 2 {
+            ok = false;
+        }
+    }
 
-    let ok = true;
     println!("{}", ifv!(ok, "Yes", "No"));
 }

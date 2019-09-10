@@ -3,10 +3,13 @@
 *.out
 **/*.rs.bk
 /.idea/
+/src/main.rs
 /src/test.rs
 /competitive-rust.iml
 /.vscode
 *.swp
 *.dSYM/
 /src/main.rs
+/in.txt
 /out.txt
+

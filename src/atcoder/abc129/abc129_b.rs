@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc129/tasks/abc129_b
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -90,9 +92,17 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        w: [i32; n]
     };
+    let mut s = vec![0; n+1];
+    for i in 0..n {
+        s[i+1] = s[i] + w[i];
+    }
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut min_diff = s[n];
+    for i in 0..n {
+        min_diff = min(min_diff, (s[n]-2*s[i]).abs());
+    }
+    println!("{}", min_diff);
 }

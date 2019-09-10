@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc128/tasks/abc128_d
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -90,9 +92,34 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, k: usize,
+        gems: [i32; n]
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut answer = 0;
+    for i in 0..n {
+        for j in i..n+1 {
+            let mut removed = vec![];
+            let mut hand = 0;
+            for k in 0..n {
+                if i <= k && k < j {
+                } else {
+                    hand += gems[k];
+                    removed.push(gems[k]);
+                }
+            }
+            // debug!(i, j, hand, removed);
+            removed.sort();
+            if k < removed.len() {
+                continue;
+            }
+            let left_ops = k-removed.len();
+            answer = max(answer, hand);
+            for i in 0..min(removed.len(), left_ops) {
+                hand -= removed[i];
+                answer = max(answer, hand);
+            }
+        }
+    }
+    println!("{}", answer);
 }

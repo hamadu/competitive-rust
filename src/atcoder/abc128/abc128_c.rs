@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc128/tasks/abc128_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -39,6 +41,13 @@ macro_rules! read_value {
 
     ($iter:expr, [ $t:tt ; $len:expr ]) => {
         (0..$len).map(|_| read_value!($iter, $t)).collect::<Vec<_>>()
+    };
+
+    ($iter:expr, [ next / $t:tt ]) => {
+        {
+            let len = read_value!($iter, usize);
+            (0..len).map(|_| read_value!($iter, $t)).collect::<Vec<_>>()
+        }
     };
 
     ($iter:expr, chars) => {
@@ -90,9 +99,33 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, m: usize,
+        bulbs: [[next / usize1]; m],
+        p: [usize; m]
     };
+    let mut switches = vec![0; n];
+    for i in 0..m {
+        for &si in &bulbs[i] {
+            switches[si] |= 1<<i;
+        }
+    }
+    let mut ans = 0;
+    for i in 0..m {
+        ans |= p[i]<<i;
+    }
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut count = 0;
+    for ptn in 0..1<<n {
+        let mut parity = 0;
+        for i in 0..n {
+            if ptn & (1<<i) >= 1{
+                parity ^= switches[i];
+            }
+        }
+        if ans == parity {
+            count += 1;
+        }
+    }
+
+    println!("{}", count);
 }

@@ -1,3 +1,5 @@
+// ${url}
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -39,6 +41,13 @@ macro_rules! read_value {
 
     ($iter:expr, [ $t:tt ; $len:expr ]) => {
         (0..$len).map(|_| read_value!($iter, $t)).collect::<Vec<_>>()
+    };
+
+    ($iter:expr, [ next / $t:tt ]) => {
+        {
+            let len = read_value!($iter, usize);
+            (0..len).map(|_| read_value!($iter, $t)).collect::<Vec<_>>()
+        }
     };
 
     ($iter:expr, chars) => {

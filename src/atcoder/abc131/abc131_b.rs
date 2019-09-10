@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc131/tasks/abc131_b
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -90,9 +92,19 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: i32, l: i32
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut best = 10000i32;
+    let mut sum = 0;
+    for i in 0..n {
+        let taste = l+i;
+        if taste.abs() < best.abs() {
+            best = taste;
+        }
+        sum += taste;
+    }
+    sum -= best;
+
+    println!("{}", sum);
 }

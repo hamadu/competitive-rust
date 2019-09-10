@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc129/tasks/abc129_d
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -90,9 +92,60 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        h: usize, w: usize,
+        s: [chars; h]
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let dx = vec![-1, 0, 1, 0];
+    let dy = vec![0, -1, 0, 1];
+    let mut wo = dvec!(0; 4, h, w);
+    for d in 0..4 {
+        if d < 2 {
+            for i in 0..h {
+                for j in 0..w {
+                    let tj = ifv!(d == 0, j, w-1-j);
+                    wo[d][i][tj] = ifv!(d == 0,
+                        ifv!(tj >= 1, wo[d][i][tj-1], 0),
+                        ifv!(tj < w-1, wo[d][i][tj+1], 0)
+                    );
+                    if s[i][tj] == '#' {
+                        wo[d][i][tj] = 0;
+                    } else {
+                        wo[d][i][tj] += 1;
+                    }
+                }
+            }
+        } else {
+            for j in 0..w {
+                for i in 0..h {
+                    let ti = ifv!(d == 2, i, h-1-i);
+                    wo[d][ti][j] = ifv!(d == 2,
+                        ifv!(ti >= 1, wo[d][ti-1][j], 0),
+                        ifv!(ti < h-1, wo[d][ti+1][j], 0)
+                    );
+                    if s[ti][j] == '#' {
+                        wo[d][ti][j] = 0;
+                    } else {
+                        wo[d][ti][j] += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    // debug!(wo);
+
+    let mut ans = 0;
+    for i in 0..h {
+        for j in 0..w {
+            if s[i][j] == '.' {
+                let mut dir = 0;
+                for d in 0..4 {
+                    dir += wo[d][i][j]-1;
+                }
+                ans = max(ans, dir+1);
+            }
+        }
+    }
+    println!("{}", ans);
 }

@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc130/tasks/abc130_b
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -90,9 +92,20 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, x: i32,
+        l: [i32; n]
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut p = 0;
+    let mut cnt = 0;
+    for i in 0..n+1 {
+        if p <= x {
+            cnt += 1;
+        }
+        if i == n {
+            break;
+        }
+        p += l[i];
+    }
+    println!("{}", cnt);
 }

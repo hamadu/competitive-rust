@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc136/tasks/abc136_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -66,22 +68,6 @@ macro_rules! dvec {
 }
 
 #[allow(unused_macros)]
-macro_rules! ifv {
-    ($t:expr, $a:expr, $b: expr) => {
-        if $t { $a } else { $b }
-    }
-}
-
-#[allow(unused_macros)]
-macro_rules! fill {
-    ($t:expr, $v:expr) => {
-        for i in 0..$t.len() {
-            $t[i] = $v;
-        }
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -90,9 +76,19 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        h: [i32; n]
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut h = h;
+    let mut ok = true;
+    h[0] -= 1;
+    for i in 1..n {
+        if h[i-1] > h[i] {
+            ok = false;
+        } else if h[i-1] < h[i] {
+            h[i] -= 1;
+        }
+    }
+    println!("{}", if ok { "Yes" } else { "No" });
 }

@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/diverta2019/tasks/diverta2019_d
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -66,22 +68,6 @@ macro_rules! dvec {
 }
 
 #[allow(unused_macros)]
-macro_rules! ifv {
-    ($t:expr, $a:expr, $b: expr) => {
-        if $t { $a } else { $b }
-    }
-}
-
-#[allow(unused_macros)]
-macro_rules! fill {
-    ($t:expr, $v:expr) => {
-        for i in 0..$t.len() {
-            $t[i] = $v;
-        }
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -90,9 +76,35 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: i64
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+
+    let mut set = HashSet::new();
+    let mut total = 0;
+    for a in 1..1000001i64 {
+        let ln = n-a;
+        if ln < 0 {
+            continue;
+        }
+        if ln % a == 0 {
+            let m = ln/a;
+            if m > a {
+                total += m;
+                set.insert(m);
+            }
+        }
+    }
+
+    for m in 1..1000001i64 {
+        let a = n/m;
+        let b = n%m;
+        if a == b {
+            if !set.contains(&m) {
+                set.insert(m);
+                total += m;
+            }
+        }
+    }
+    println!("{}", total);
 }

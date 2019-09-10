@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc136/tasks/abc136_d
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -66,22 +68,6 @@ macro_rules! dvec {
 }
 
 #[allow(unused_macros)]
-macro_rules! ifv {
-    ($t:expr, $a:expr, $b: expr) => {
-        if $t { $a } else { $b }
-    }
-}
-
-#[allow(unused_macros)]
-macro_rules! fill {
-    ($t:expr, $v:expr) => {
-        for i in 0..$t.len() {
-            $t[i] = $v;
-        }
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -90,9 +76,31 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        s: chars
     };
+    let n = s.len();
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut v = vec![0; n];
+    let mut fr = 0;
+    let mut to = 0;
+    while fr < n {
+        let mut to = fr;
+        while to < n && s[to] == 'R' {
+            to += 1;
+        }
+        let r = to-fr;
+        while to < n && s[to] == 'L' {
+            to += 1;
+        }
+        let l = to-fr-r;
+        let lidx = fr+r-1;
+        let ridx = fr+r;
+
+        v[lidx] += (r+1)/2+l/2;
+        v[ridx] += r/2+(l+1)/2;
+        fr = to;
+    }
+
+    let line = v.into_iter().map(|num| num.to_string()).collect::<Vec<_>>().join(" ");
+    println!("{}", line);
 }

@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/diverta2019/tasks/diverta2019_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -66,22 +68,6 @@ macro_rules! dvec {
 }
 
 #[allow(unused_macros)]
-macro_rules! ifv {
-    ($t:expr, $a:expr, $b: expr) => {
-        if $t { $a } else { $b }
-    }
-}
-
-#[allow(unused_macros)]
-macro_rules! fill {
-    ($t:expr, $v:expr) => {
-        for i in 0..$t.len() {
-            $t[i] = $v;
-        }
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -90,9 +76,7 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: i32, k: i32
     };
-
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    println!("{}", n-k+1);
 }

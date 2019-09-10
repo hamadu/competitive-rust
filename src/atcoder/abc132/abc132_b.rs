@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc132/tasks/abc132_b
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -73,15 +75,6 @@ macro_rules! ifv {
 }
 
 #[allow(unused_macros)]
-macro_rules! fill {
-    ($t:expr, $v:expr) => {
-        for i in 0..$t.len() {
-            $t[i] = $v;
-        }
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -90,9 +83,16 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, p: [i32; n]
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut count = 0;
+    for i in 1..n-1 {
+        let mut ve = vec![p[i-1], p[i], p[i+1]];
+        ve.sort();
+        if ve[1] == p[i] {
+            count += 1;
+        }
+    }
+    println!("{}", count);
 }

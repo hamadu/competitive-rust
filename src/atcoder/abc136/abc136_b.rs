@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc136/tasks/abc136_b
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -66,33 +68,34 @@ macro_rules! dvec {
 }
 
 #[allow(unused_macros)]
-macro_rules! ifv {
-    ($t:expr, $a:expr, $b: expr) => {
-        if $t { $a } else { $b }
-    }
-}
-
-#[allow(unused_macros)]
-macro_rules! fill {
-    ($t:expr, $v:expr) => {
-        for i in 0..$t.len() {
-            $t[i] = $v;
-        }
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
     }
 }
 
+
+///  [a, b) and [c, d)
+fn intersect(a: i32, b: i32, c: i32, d: i32) -> i32 {
+    let from = max(a, c);
+    let to = min(b, d);
+    max(0, to-from)
+}
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: i32
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut total = 0;
+    let mut from = 1;
+    let mut w = 1;
+    while from <= n+1  {
+        let to = from * 10;
+        total += w * intersect(1, n+1, from, to);
+
+        w ^= 1;
+        from *= 10;
+    }
+    println!("{}", total);
 }

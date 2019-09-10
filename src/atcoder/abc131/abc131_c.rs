@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc131/tasks/abc131_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -88,11 +90,22 @@ macro_rules! debug {
     }
 }
 
+fn gcd(a: i64, b: i64) -> i64 {
+    if b == 0 {
+        a
+    } else {
+        gcd(b, a%b)
+    }
+}
+
+fn solve(n: i64, c: i64, d: i64) -> i64 {
+    n - n/c - n/d + n/(c*d/gcd(c,d))
+}
+
 fn main() {
     input! {
-        n: usize, m: usize
+        a: i64, b: i64, c: i64, d: i64
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    println!("{}", solve(b, c, d) - solve(a-1, c, d));
 }

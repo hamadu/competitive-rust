@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc130/tasks/abc130_e
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -88,11 +90,39 @@ macro_rules! debug {
     }
 }
 
+const MOD: i64 = 1e9 as i64 + 7;
+
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, m: usize,
+        s: [i32; n],
+        t: [i32; m]
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut dp = dvec!(0; n+1, m+1);
+    let mut dp2 = dvec!(0; n+1, m+1);
+    dp[0][0] = 0;
+    dp2[0][0] = 0;
+    for i in 0..n+1 {
+        for j in 0..m+1 {
+            if i >= 1 && j >= 1 {
+                if s[i-1] == t[j-1] {
+                    dp[i][j] = dp2[i-1][j-1] + 1;
+                    dp[i][j] %= MOD;
+                }
+                dp2[i][j] = dp2[i-1][j] + dp2[i][j-1] + MOD - dp2[i-1][j-1];
+                dp2[i][j] += dp[i][j];
+                dp2[i][j] %= MOD;
+            }
+        }
+    }
+
+    let mut hoge = 1;
+    for i in 0..n+1 {
+        for j in 0..m+1 {
+            hoge += dp[i][j];
+            hoge %= MOD;
+        }
+    }
+    println!("{}", hoge);
 }

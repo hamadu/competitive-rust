@@ -1,9 +1,11 @@
+// https://atcoder.jp/contests/diverta2019/tasks/diverta2019_b
+//
 #![allow(unused_imports)]
-use std::io::*;
-use std::fmt::*;
-use std::str::*;
 use std::cmp::*;
 use std::collections::*;
+use std::fmt::*;
+use std::io::*;
+use std::str::*;
 
 macro_rules! input {
     (source = $s:expr, $($r:tt)*) => {
@@ -66,22 +68,6 @@ macro_rules! dvec {
 }
 
 #[allow(unused_macros)]
-macro_rules! ifv {
-    ($t:expr, $a:expr, $b: expr) => {
-        if $t { $a } else { $b }
-    }
-}
-
-#[allow(unused_macros)]
-macro_rules! fill {
-    ($t:expr, $v:expr) => {
-        for i in 0..$t.len() {
-            $t[i] = $v;
-        }
-    };
-}
-
-#[allow(unused_macros)]
 macro_rules! debug {
     ($($a:expr),*) => {
         println!(concat!($(stringify!($a), " = {:?}, "),*), $($a),*);
@@ -90,9 +76,19 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        r: i32, g: i32, b: i32, n: i32
     };
-
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    let mut total = 0;
+    for i in 0..3001 {
+        for j in 0..3001 {
+            let left = n - i * r - j * g;
+            if left < 0 {
+                continue;
+            }
+            if left % b == 0 {
+                total += 1;
+            }
+        }
+    }
+    println!("{}", total);
 }

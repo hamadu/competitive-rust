@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc129/tasks/abc129_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -90,9 +92,7 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        p: i32, q: i32, r: i32
     };
-
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    println!("{}", min(p+q, min(p+r, q+r)));
 }

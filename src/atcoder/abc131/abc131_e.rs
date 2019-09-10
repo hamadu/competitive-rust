@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc131/tasks/abc131_e
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -90,9 +92,31 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize, k: usize
     };
+    let mut edges = vec![];
+    for i in 0..n-1 {
+        edges.push((i, n-1));
+    }
+    let all = (n-2)*(n-1)/2;
+    if k > all {
+        println!("-1");
+        return;
+    } else if k < all {
+        let mut all = all;
+        'lp: for i in 0..n-1 {
+            for j in i+1..n-1 {
+                edges.push((i, j));
+                all -= 1;
+                if all == k {
+                    break 'lp;
+                }
+            }
+        }
+    }
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    println!("{}", edges.len());
+    for e in edges {
+        println!("{} {}", e.0+1, e.1+1);
+    }
 }

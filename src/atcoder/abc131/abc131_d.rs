@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc131/tasks/abc131_d
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -90,9 +92,21 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        n: usize,
+        jobs: [(i64, i64); n]
     };
 
-    let ok = true;
+    let mut now = 0;
+    let mut jobs = jobs;
+    jobs.sort_by_key(|k| k.1);
+
+    let mut ok = true;
+    for (time,till) in jobs {
+        if now+time > till {
+            ok = false;
+            break;
+        }
+        now += time;
+    }
     println!("{}", ifv!(ok, "Yes", "No"));
 }

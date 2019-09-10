@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc128/tasks/abc128_a
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -90,9 +92,8 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        a: usize, p: usize
     };
 
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    println!("{}", (3*a+p)/2);
 }

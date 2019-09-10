@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/abc130/tasks/abc130_c
+//
 #![allow(unused_imports)]
 use std::io::*;
 use std::fmt::*;
@@ -90,9 +92,7 @@ macro_rules! debug {
 
 fn main() {
     input! {
-        n: usize, m: usize
+        w: i64, h: i64, x: i64, y: i64
     };
-
-    let ok = true;
-    println!("{}", ifv!(ok, "Yes", "No"));
+    println!("{} {}", ((w*h) as f64) / 2f64, ifv!(x * 2 == w && y * 2 == h, 1, 0));
 }
